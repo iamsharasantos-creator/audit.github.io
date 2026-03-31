@@ -30,50 +30,26 @@
             line-height: 1.5;
         }
 
-        /* Layout Wrapper */
-        .main-wrapper {
-            display: flex;
-            gap: 25px;
-            max-width: 1200px;
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            align-items: flex-start;
-        }
-
-        /* Left Side: Cloud Records */
-        .sidebar {
-            flex: 1;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            max-height: 90vh;
-            overflow-y: auto;
-            position: sticky;
-            top: 20px;
-        }
-
-        /* Right Side: Original Audit Log */
-        .main-content {
-            flex: 1.8;
         }
 
         .audit-box {
             background: var(--card-bg);
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
-        h1, h2 {
+        h1 {
             text-align: center;
+            font-size: 1.8rem;
             font-weight: 800;
             color: #0f172a;
             margin-bottom: 5px;
             letter-spacing: -0.025em;
         }
-
-        h1 { font-size: 1.8rem; }
-        h2 { font-size: 1.3rem; margin-top: 0; }
 
         .subtitle {
             text-align: center;
@@ -82,106 +58,260 @@
             font-size: 0.95rem;
         }
 
-        /* Table Styling */
-        .cloud-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 0.85rem;
+        .product-section {
+            margin-bottom: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
         }
 
-        .cloud-table th {
-            background: #f8fafc;
-            padding: 10px;
-            text-align: left;
-            border-bottom: 2px solid var(--border);
+        .product-section:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: #fff;
+        }
+
+        .product-line {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0f172a;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
         }
 
-        .cloud-table td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
+        input[type="date"], input[type="number"] {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
         }
 
-        .refresh-btn {
-            width: 100%;
-            margin-bottom: 15px;
-            background: #6366f1;
+        input[type="date"] {
+            min-width: 150px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            font-weight: 600;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .enter-btn {
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: opacity 0.2s;
+            font-size: 0.95rem;
+            align-self: flex-end;
+            transition: background-color 0.2s;
         }
 
-        /* ... (rest of your original component styles) ... */
-        .product-section { margin-bottom: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; transition: all 0.2s ease; }
-        .product-section:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); background: #fff; }
-        .product-line { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #0f172a; }
-        .input-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .input-group { display: flex; flex-direction: column; gap: 4px; }
-        label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
-        input[type="date"], input[type="number"] { background: #fff; color: var(--text-main); border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px; font-family: inherit; font-size: 0.95rem; }
-        input[type="number"] { width: 100px; font-weight: 600; }
-        .enter-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; align-self: flex-end; }
-        .status { margin-top: 10px; padding: 8px 12px; font-size: 0.85rem; border-radius: 6px; display: none; font-weight: 500; }
-        .status.sent { background: var(--success-light); color: var(--success-dark); display: flex; align-items: center; gap: 6px; }
-        .grand-total { font-size: 1.4rem; margin: 30px 0 20px 0; background: #0f172a; color: #fff; padding: 20px; text-align: center; border-radius: 12px; font-weight: 700; }
-        .summary-section { margin-top: 25px; padding: 20px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; max-height: 400px; overflow-y: auto; }
-        .summary-title { text-align: center; font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-bottom: 15px; }
-        .summary-product { margin-bottom: 12px; padding: 12px; background: #fff; border: 1px solid var(--border); border-radius: 8px; }
-        .product-header { font-weight: 700; color: #0f172a; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-        .summary-item { display: flex; justify-content: space-between; padding: 4px 8px; margin: 2px 0; background: #f8fafc; border-radius: 4px; font-size: 0.9rem; color: var(--text-muted); }
-        .product-total { font-weight: 700; color: var(--success-dark); background: var(--success-light); padding: 6px; border-radius: 6px; margin-top: 8px; font-size: 0.85rem; text-align: right; }
-        .action-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 25px; }
-        .btn { background: #fff; color: var(--text-main); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; }
-        .btn-danger { color: var(--danger); }
-        .btn-primary { background: var(--primary); color: white; }
+        .enter-btn:hover {
+            background: var(--primary-hover);
+        }
 
-        @media (max-width: 1000px) {
-            .main-wrapper { flex-direction: column; }
-            .sidebar { position: static; max-height: none; width: 100%; box-sizing: border-box; }
-            .main-content { width: 100%; }
+        .status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .status.sent {
+            background: var(--success-light);
+            color: var(--success-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .grand-total {
+            font-size: 1.4rem;
+            margin: 30px 0 20px 0;
+            background: #0f172a;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+        }
+
+        /* SUMMARY STYLES */
+        .summary-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .summary-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 15px;
+        }
+
+        .summary-product {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .product-header {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            margin: 2px 0;
+            background: #f8fafc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .product-total {
+            font-weight: 700;
+            color: var(--success-dark);
+            background: var(--success-light);
+            padding: 6px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        /* ACTION BUTTONS */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .audit-box { box-shadow: none; padding: 0; }
+            .summary-section { max-height: none; }
+            .btn, .enter-btn, .input-row, .subtitle { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="sidebar">
-        <h2>📊 Cloud Records</h2>
-        <button class="refresh-btn" onclick="fetchCloudData()">🔄 Refresh from Sheets</button>
-        <div id="cloudTableContainer">
-            <p style="text-align:center; color:var(--text-muted);">Click refresh to load database...</p>
+<div class="container">
+    <div class="audit-box">
+        <h1>Sticker Audit Log</h1>
+        <div class="subtitle">Enter counts, press Enter or click Add to log.</div>
+
+        <div id="products-container"></div>
+
+        <div class="grand-total" id="grandTotal">
+            GRAND TOTAL: 0 STICKERS
         </div>
-    </div>
 
-    <div class="main-content">
-        <div class="audit-box">
-            <h1>Sticker Audit Log</h1>
-            <div class="subtitle">Enter counts, press Enter or click Add to log.</div>
+        <div class="summary-section" id="summarySection" style="display: none;">
+            <div class="summary-title">📊 Live Summary</div>
+            <div id="summaryList"></div>
+        </div>
 
-            <div id="products-container"></div>
-
-            <div class="grand-total" id="grandTotal">
-                GRAND TOTAL: 0 STICKERS
-            </div>
-
-            <div class="summary-section" id="summarySection" style="display: none;">
-                <div class="summary-title">📊 Live Summary</div>
-                <div id="summaryList"></div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
-                <button class="btn btn-primary" onclick="toggleSummary()">📋 Toggle Summary</button>
-                <button class="btn btn-primary" onclick="copySummary()">📄 Copy Summary</button>
-                <button class="btn btn-primary" onclick="toggleDetailedSummary()">📝 Edit All Entries</button>
-                <button class="btn btn-success" id="saveBtn" onclick="saveToGoogleSheets()" style="background: #10b981; color: white; border-color: #10b981;">☁️ Save to Sheets</button>
-            </div>
+        <div class="action-buttons">
+            <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+            <button class="btn btn-primary" onclick="toggleSummary()">📋 Toggle Summary</button>
+            <button class="btn btn-primary" onclick="copySummary()">📄 Copy Summary</button>
+            <button class="btn btn-primary" onclick="toggleDetailedSummary()">📝 Edit All Entries</button>
+            <button class="btn btn-success" id="saveBtn" onclick="saveToGoogleSheets()" style="background: #10b981; color: white; border-color: #10b981;">☁️ Save to Sheets</button>
         </div>
     </div>
 </div>
@@ -194,8 +324,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzMM60idR6QEYvznvh2ogYXDxSJ9552beS6rLFMNdhqRtqDh0zuOq4TwrHCJ8u5uKCFOA/exec";
-    
+    // Product List Array
     const productList = [
         "1 x SEAT COVER", "1 x MINI FLASHLIGHT", "1 x FULL FACE BALACLAVA",
         "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x SHOE CLEANER", "2 x FLASHLIGHT",
@@ -204,9 +333,11 @@
 
     let summaryData = {}; 
     let summaryVisible = false;
+
+    // Build standard date string (YYYY-MM-DD)
     const today = new Date().toISOString().split('T')[0];
 
-    // Generate Inputs
+    // Dynamically generate product inputs
     const container = document.getElementById('products-container');
     productList.forEach((product, index) => {
         const id = index + 1;
@@ -230,39 +361,6 @@
         `;
     });
 
-    // FETCH RECORDS FROM GOOGLE SHEETS
-    function fetchCloudData() {
-        const tableContainer = document.getElementById('cloudTableContainer');
-        tableContainer.innerHTML = '<p style="text-align:center;">⌛ Fetching data...</p>';
-
-        fetch(WEB_APP_URL)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success" && data.records) {
-                    let html = '<table class="cloud-table"><thead><tr><th>Date</th><th>Product</th><th>Qty</th></tr></thead><tbody>';
-                    data.records.forEach(row => {
-                        html += `<tr>
-                            <td>${row.date || 'N/A'}</td>
-                            <td>${row.product || 'N/A'}</td>
-                            <td>${row.count || '0'}</td>
-                        </tr>`;
-                    });
-                    html += '</tbody></table>';
-                    tableContainer.innerHTML = html;
-                } else {
-                    tableContainer.innerHTML = '<p style="text-align:center;color:var(--danger);">No records found in Sheet.</p>';
-                }
-            })
-            .catch(error => {
-                console.error("Fetch error:", error);
-                tableContainer.innerHTML = '<p style="text-align:center;color:var(--danger);">❌ Error connecting to database.</p>';
-            });
-    }
-
-    // Load data automatically on start
-    window.onload = fetchCloudData;
-
-    // --- Original Functions ---
     function enterItem(id) {
         const dateInput = document.getElementById(`date${id}`).value;
         const countInput = document.getElementById(`count${id}`).value;
@@ -275,12 +373,19 @@
 
         if (!summaryData[`item${id}`]) { summaryData[`item${id}`] = []; }
 
-        summaryData[`item${id}`].push({ product: productName, date: dateInput, count: count });
+        summaryData[`item${id}`].push({
+            product: productName,
+            date: dateInput,
+            count: count
+        });
+
         const productTotal = summaryData[`item${id}`].reduce((sum, entry) => sum + entry.count, 0);
         
         statusEl.innerHTML = `<span>✅ Added ${count}</span> <span>| Total: ${productTotal}</span>`;
         statusEl.style.display = 'block';
         statusEl.className = 'status sent';
+
+        // Clear number input for the next entry
         document.getElementById(`count${id}`).value = '';
 
         calculateGrandTotal();
@@ -290,64 +395,238 @@
 
     function calculateGrandTotal() {
         let grandTotal = 0;
-        Object.values(summaryData).forEach(entries => entries.forEach(entry => grandTotal += entry.count));
+        Object.values(summaryData).forEach(entries => {
+            entries.forEach(entry => grandTotal += entry.count);
+        });
         document.getElementById('grandTotal').textContent = `GRAND TOTAL: ${grandTotal} STICKERS`;
     }
 
     function updateSummary() {
         const summaryList = document.getElementById('summaryList');
         let summaryHTML = '';
+
         Object.keys(summaryData).forEach(key => {
             const entries = summaryData[key];
             if (entries.length > 0) {
                 const productName = entries[0].product;
                 const productTotal = entries.reduce((sum, entry) => sum + entry.count, 0);
-                summaryHTML += `<div class="summary-product"><div class="product-header"><span>${productName}</span><span>Total: ${productTotal}</span></div>`;
-                entries.forEach(entry => { summaryHTML += `<div class="summary-item"><span>📅 ${entry.date}</span><span>${entry.count} stickers</span></div>`; });
-                summaryHTML += `<div class="product-total">🏆 Current Total: ${productTotal} Stickers</div></div>`;
+
+                summaryHTML += `
+                    <div class="summary-product">
+                        <div class="product-header">
+                            <span>${productName}</span>
+                            <span>Total: ${productTotal}</span>
+                        </div>
+                `;
+
+                entries.forEach(entry => {
+                    summaryHTML += `
+                        <div class="summary-item">
+                            <span>📅 ${entry.date}</span>
+                            <span>${entry.count} stickers</span>
+                        </div>
+                    `;
+                });
+
+                summaryHTML += `
+                        <div class="product-total">
+                            🏆 Current Total: ${productTotal} Stickers
+                        </div>
+                    </div>
+                `;
             }
         });
-        summaryList.innerHTML = summaryHTML || '<div style="text-align:center;color:#64748b;padding:20px;">No entries yet.</div>';
+
+        summaryList.innerHTML = summaryHTML || '<div style="text-align:center;color:#64748b;padding:20px;">No entries yet. Add some data above!</div>';
     }
 
-    function showSummary() { summaryVisible = true; document.getElementById('summarySection').style.display = 'block'; updateSummary(); }
-    function toggleSummary() { summaryVisible = !summaryVisible; document.getElementById('summarySection').style.display = summaryVisible ? 'block' : 'none'; if (summaryVisible) updateSummary(); }
+    function showSummary() {
+        summaryVisible = true;
+        document.getElementById('summarySection').style.display = 'block';
+        updateSummary();
+    }
+
+    function toggleSummary() {
+        summaryVisible = !summaryVisible;
+        document.getElementById('summarySection').style.display = summaryVisible ? 'block' : 'none';
+        if (summaryVisible) updateSummary();
+    }
 
     function clearAll() {
-        if (!confirm('Clear ALL entries?')) return;
+        if (!confirm('Clear ALL entries? This cannot be undone!')) return;
+        
         summaryData = {};
         for(let i = 1; i <= productList.length; i++) {
+            document.getElementById(`date${i}`).value = today;
             document.getElementById(`count${i}`).value = '';
             document.getElementById(`status${i}`).style.display = 'none';
+            document.getElementById(`status${i}`).className = 'status';
         }
         document.getElementById('grandTotal').textContent = 'GRAND TOTAL: 0 STICKERS';
         document.getElementById('summarySection').style.display = 'none';
         summaryVisible = false;
-        if(document.getElementById('detailedSummaryContainer').style.display === 'block') populateDetailedSummary();
+        document.getElementById('summaryList').innerHTML = '';
+        
+        if(document.getElementById('detailedSummaryContainer').style.display === 'block') {
+            populateDetailedSummary();
+        }
     }
 
+    function copySummary() {
+        let textOutput = '';
+        Object.keys(summaryData).forEach(key => {
+            const entries = summaryData[key];
+            if (entries.length > 0) {
+                const productName = entries[0].product;
+                const productTotal = entries.reduce((sum, entry) => sum + entry.count, 0);
+                textOutput += `${productName}\n`;
+                entries.forEach(entry => { textOutput += `${entry.date} - ${entry.count}\n`; });
+                textOutput += `TOTAL = ${productTotal}\n\n`;
+            }
+        });
+
+        if (!textOutput) { alert("No data to copy!"); return; }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(textOutput)
+                .then(() => alert("✅ Summary copied to clipboard!"))
+                .catch(err => fallbackCopyTextToClipboard(textOutput));
+        } else {
+            fallbackCopyTextToClipboard(textOutput);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            if (document.execCommand('copy')) alert("✅ Summary copied to clipboard!");
+            else alert("❌ Failed to copy! Please select and copy manually.");
+        } catch (err) {
+            alert("❌ Failed to copy! Please select and copy manually.");
+        }
+        document.body.removeChild(textArea);
+    }
+    
+    function toggleDetailedSummary() {
+        const container = document.getElementById('detailedSummaryContainer');
+        if (container.style.display === 'none') {
+            populateDetailedSummary();
+            container.style.display = 'block';
+            // Scroll down so the user can see it
+            container.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    function populateDetailedSummary() {
+        const container = document.getElementById('detailedSummary');
+        let html = '';
+
+        Object.keys(summaryData).forEach(key => {
+            const entries = summaryData[key];
+            if (entries.length > 0) {
+                // UI Fix: Show the product name so the user knows what they are editing
+                html += `<div class="product-section" style="margin-bottom:15px; padding:15px; background: white; max-width: 600px; margin-left: auto; margin-right: auto;">`;
+                html += `<div style="font-weight: 700; color: #0f172a; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px;">${entries[0].product}</div>`;
+                
+                entries.forEach((entry, index) => {
+                    html += `
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom: 8px;">
+                        <input type="date" value="${entry.date}" style="flex:1;" onchange="updateEntry('${key}', ${index}, 'date', this.value)">
+                        <input type="number" value="${entry.count}" style="width:80px;" min="1" onchange="updateEntry('${key}', ${index}, 'count', this.value)">
+                        <button class="btn btn-danger" style="padding: 10px;" onclick="deleteEntry('${key}', ${index})" title="Delete Entry">🗑️</button>
+                    </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+        });
+        
+        if (!html) {
+            html = '<div style="text-align:center; color:#64748b; padding:20px;">No entries to manage.</div>';
+        }
+        container.innerHTML = html;
+    }
+
+    function updateEntry(itemKey, index, field, value) {
+        if (summaryData[itemKey] && summaryData[itemKey][index]) {
+            if (field === 'date') {
+                summaryData[itemKey][index].date = value;
+            } else if (field === 'count') {
+                const num = parseInt(value);
+                if (!isNaN(num) && num > 0) {
+                    summaryData[itemKey][index].count = num;
+                } else {
+                    alert('Count must be a number greater than 0.');
+                    populateDetailedSummary();
+                    return;
+                }
+            }
+            calculateGrandTotal();
+            updateSummary();
+            // We intentionally don't call populateDetailedSummary() here 
+            // so we don't lose focus on the input box while editing.
+        }
+    }
+
+    function deleteEntry(itemKey, index) {
+        if (summaryData[itemKey]) {
+            summaryData[itemKey].splice(index, 1);
+            if (summaryData[itemKey].length === 0) delete summaryData[itemKey];
+            calculateGrandTotal();
+            updateSummary();
+            populateDetailedSummary();
+        }
+    }
+
+    // --- GOOGLE SHEETS BACKEND INTEGRATION ---
+
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzGWjq5203tOAJcDdSeIP58lYTNIELRqbOzzeT6adDX/dev";
+
     function saveToGoogleSheets() {
-        if (Object.keys(summaryData).length === 0) { alert("⚠️ No data to save!"); return; }
+        if (Object.keys(summaryData).length === 0) {
+            alert("⚠️ No data to save!");
+            return;
+        }
+
         const saveBtn = document.getElementById('saveBtn');
         saveBtn.innerText = "⏳ Saving...";
         saveBtn.disabled = true;
 
         fetch(WEB_APP_URL, {
             method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            redirect: "follow",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8", 
+            },
+            redirect: "follow", // <-- Crucial FIX for Google Apps Script redirects
             body: JSON.stringify(summaryData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.result === "success" || data.status === "success") {
-                alert("✅ Successfully saved!");
-                clearAll();
-                fetchCloudData(); // Auto refresh the table
-            } else { alert("❌ Error: " + (data.error || "Unknown")); }
+                alert("✅ Successfully saved to Google Sheets!");
+                if (confirm("Data saved! Would you like to clear the current entries?")) {
+                    clearAll();
+                }
+            } else {
+                alert("❌ Database error: " + (data.error || "Unknown error"));
+            }
         })
-        .catch(error => alert("❌ Connection failed."))
-        .finally(() => { saveBtn.innerText = "☁️ Save to Sheets"; saveBtn.disabled = false; });
+        .catch(error => {
+            console.error("Error:", error);
+            alert("❌ Failed to reach the server. Check your connection or deployment URL.");
+        })
+        .finally(() => {
+            saveBtn.innerText = "☁️ Save to Sheets";
+            saveBtn.disabled = false;
+        });
     }
 </script>
 
