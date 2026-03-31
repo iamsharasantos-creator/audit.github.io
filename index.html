@@ -317,8 +317,8 @@
 </div>
 
 <div style="margin-top: 25px;">
-  <div id="detailedSummaryContainer" style="display:none; margin-top:15px;">
-    <div class="summary-title">🛠️ Manage Entries</div>
+  <div id="detailedSummaryContainer" style="display:none; margin-top:15px; padding-bottom: 50px;">
+    <div class="summary-title" style="color: var(--text-main);">🛠️ Manage Entries</div>
     <div id="detailedSummary"></div>
   </div>
 </div>
@@ -328,7 +328,7 @@
     const productList = [
         "1 x SEAT COVER", "1 x MINI FLASHLIGHT", "1 x FULL FACE BALACLAVA",
         "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x SHOE CLEANER", "2 x FLASHLIGHT",
-        "2 x MINI FLASHLIGHT", "1 x PANTY STOCKINGS", "1 x MAGIC MESH", "2 x ANTI - PULGAS","1 x MAGIC TOWEL"
+        "2 x MINI FLASHLIGHT", "1 x PANTY STOCKINGS", "1 x MAGIC MESH", "2 x ANTI - PULGAS", "1 x MAGIC TOWEL"
     ];
 
     let summaryData = {}; 
@@ -382,6 +382,7 @@
         const productTotal = summaryData[`item${id}`].reduce((sum, entry) => sum + entry.count, 0);
         
         statusEl.innerHTML = `<span>✅ Added ${count}</span> <span>| Total: ${productTotal}</span>`;
+        statusEl.style.display = 'block';
         statusEl.className = 'status sent';
 
         // Clear number input for the next entry
@@ -465,9 +466,11 @@
         document.getElementById('summarySection').style.display = 'none';
         summaryVisible = false;
         document.getElementById('summaryList').innerHTML = '';
+        
+        if(document.getElementById('detailedSummaryContainer').style.display === 'block') {
+            populateDetailedSummary();
+        }
     }
-
-    function printAudit() { window.print(); }
 
     function copySummary() {
         let textOutput = '';
@@ -511,121 +514,120 @@
     }
     
     function toggleDetailedSummary() {
-    const container = document.getElementById('detailedSummaryContainer');
-    if (container.style.display === 'none') {
-        populateDetailedSummary();
-        container.style.display = 'block';
-    } else {
-        container.style.display = 'none';
+        const container = document.getElementById('detailedSummaryContainer');
+        if (container.style.display === 'none') {
+            populateDetailedSummary();
+            container.style.display = 'block';
+            // Scroll down so the user can see it
+            container.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            container.style.display = 'none';
+        }
     }
-}
 
-function populateDetailedSummary() {
-    const container = document.getElementById('detailedSummary');
-    let html = '';
+    function populateDetailedSummary() {
+        const container = document.getElementById('detailedSummary');
+        let html = '';
 
-    Object.keys(summaryData).forEach(key => {
-        const entries = summaryData[key];
-        if (entries.length > 0) {
-            // For each entry, provide editing fields and delete button
-            entries.forEach((entry, index) => {
-                html += `
-                <div class="product-section" style="margin-bottom:10px; padding:10px;">
-                    <div style="display:flex; gap:10px; align-items:center;">
+        Object.keys(summaryData).forEach(key => {
+            const entries = summaryData[key];
+            if (entries.length > 0) {
+                // UI Fix: Show the product name so the user knows what they are editing
+                html += `<div class="product-section" style="margin-bottom:15px; padding:15px; background: white; max-width: 600px; margin-left: auto; margin-right: auto;">`;
+                html += `<div style="font-weight: 700; color: #0f172a; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px;">${entries[0].product}</div>`;
+                
+                entries.forEach((entry, index) => {
+                    html += `
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom: 8px;">
                         <input type="date" value="${entry.date}" style="flex:1;" onchange="updateEntry('${key}', ${index}, 'date', this.value)">
                         <input type="number" value="${entry.count}" style="width:80px;" min="1" onchange="updateEntry('${key}', ${index}, 'count', this.value)">
-                        <button class="btn btn-danger" onclick="deleteEntry('${key}', ${index})">🗑️ Delete</button>
+                        <button class="btn btn-danger" style="padding: 10px;" onclick="deleteEntry('${key}', ${index})" title="Delete Entry">🗑️</button>
                     </div>
-                </div>
-                `;
-            });
-        }
-    });
-    if (!html) {
-        html = '<div style="text-align:center; color:#64748b; padding:20px;">No entries to manage.</div>';
-    }
-    container.innerHTML = html;
-}
-
-function updateEntry(itemKey, index, field, value) {
-    if (summaryData[itemKey] && summaryData[itemKey][index]) {
-        if (field === 'date') {
-            summaryData[itemKey][index].date = value;
-        } else if (field === 'count') {
-            const num = parseInt(value);
-            if (!isNaN(num) && num > 0) {
-                summaryData[itemKey][index].count = num;
-            } else {
-                alert('Count must be a number greater than 0.');
-                // Revert to previous value
-                populateDetailedSummary();
-                return;
+                    `;
+                });
+                html += `</div>`;
             }
+        });
+        
+        if (!html) {
+            html = '<div style="text-align:center; color:#64748b; padding:20px;">No entries to manage.</div>';
         }
-        // Refresh the summary view
-        calculateGrandTotal();
-        updateSummary();
-        populateDetailedSummary();
+        container.innerHTML = html;
     }
-}
 
-function deleteEntry(itemKey, index) {
-    if (summaryData[itemKey]) {
-        summaryData[itemKey].splice(index, 1);
-        // Remove key if no entries left
-        if (summaryData[itemKey].length === 0) delete summaryData[itemKey];
-        calculateGrandTotal();
-        updateSummary();
-        populateDetailedSummary();
+    function updateEntry(itemKey, index, field, value) {
+        if (summaryData[itemKey] && summaryData[itemKey][index]) {
+            if (field === 'date') {
+                summaryData[itemKey][index].date = value;
+            } else if (field === 'count') {
+                const num = parseInt(value);
+                if (!isNaN(num) && num > 0) {
+                    summaryData[itemKey][index].count = num;
+                } else {
+                    alert('Count must be a number greater than 0.');
+                    populateDetailedSummary();
+                    return;
+                }
+            }
+            calculateGrandTotal();
+            updateSummary();
+            // We intentionally don't call populateDetailedSummary() here 
+            // so we don't lose focus on the input box while editing.
+        }
     }
-}
+
+    function deleteEntry(itemKey, index) {
+        if (summaryData[itemKey]) {
+            summaryData[itemKey].splice(index, 1);
+            if (summaryData[itemKey].length === 0) delete summaryData[itemKey];
+            calculateGrandTotal();
+            updateSummary();
+            populateDetailedSummary();
+        }
+    }
+
     // --- GOOGLE SHEETS BACKEND INTEGRATION ---
 
-// Replace this URL with the one you copied in Step 3!
-const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzMM60idR6QEYvznvh2ogYXDxSJ9552beS6rLFMNdhqRtqDh0zuOq4TwrHCJ8u5uKCFOA/exec";
 
-function saveToGoogleSheets() {
-    // Check if there is data to save
-    if (Object.keys(summaryData).length === 0) {
-        alert("⚠️ No data to save!");
-        return;
-    }
-
-    const saveBtn = document.getElementById('saveBtn');
-    saveBtn.innerText = "⏳ Saving...";
-    saveBtn.disabled = true;
-
-    // Send the data to Google Apps Script
-    fetch(WEB_APP_URL, {
-        method: "POST",
-        // Using text/plain prevents complex CORS preflight issues with Google Apps Script
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8", 
-        },
-        body: JSON.stringify(summaryData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.result === "success") {
-            alert("✅ Successfully saved to Google Sheets!");
-            // Optional: Ask if they want to clear the screen after a successful save
-            if (confirm("Data saved! Would you like to clear the current entries?")) {
-                clearAll();
-            }
-        } else {
-            alert("❌ Database error: " + data.error);
+    function saveToGoogleSheets() {
+        if (Object.keys(summaryData).length === 0) {
+            alert("⚠️ No data to save!");
+            return;
         }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("❌ Failed to reach the server. Check your connection.");
-    })
-    .finally(() => {
-        // Reset button state
-        saveBtn.innerText = "☁️ Save to Sheets";
-        saveBtn.disabled = false;
-    });
-}
+
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.innerText = "⏳ Saving...";
+        saveBtn.disabled = true;
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8", 
+            },
+            redirect: "follow", // <-- Crucial FIX for Google Apps Script redirects
+            body: JSON.stringify(summaryData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result === "success" || data.status === "success") {
+                alert("✅ Successfully saved to Google Sheets!");
+                if (confirm("Data saved! Would you like to clear the current entries?")) {
+                    clearAll();
+                }
+            } else {
+                alert("❌ Database error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("❌ Failed to reach the server. Check your connection or deployment URL.");
+        })
+        .finally(() => {
+            saveBtn.innerText = "☁️ Save to Sheets";
+            saveBtn.disabled = false;
+        });
+    }
 </script>
 
 </body>
