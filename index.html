@@ -171,6 +171,146 @@
             letter-spacing: 0.025em;
         }
 
+        /* HISTORY SECTION - ENHANCED */
+        #historySection {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            position: relative;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .history-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: var(--success-dark);
+        }
+
+        #historyList {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.88rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 400px;
+        }
+
+        .history-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .history-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+
+        .history-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .record-count {
+            background: var(--success-light);
+            color: var(--success-dark);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: var(--danger);
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
         /* SUMMARY STYLES */
         .summary-section {
             margin-top: 25px;
@@ -239,27 +379,6 @@
             margin-top: 25px;
         }
 
-        .btn {
-            background: #fff;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
-
         .btn-danger {
             color: var(--danger);
         }
@@ -269,22 +388,22 @@
             border-color: #fecaca;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            border-color: var(--primary-hover);
-        }
-
         @media print {
             body { background: white; color: black; padding: 0; }
             .audit-box { box-shadow: none; padding: 0; }
             .summary-section { max-height: none; }
-            .btn, .enter-btn, .input-row, .subtitle { display: none !important; }
+            .btn, .enter-btn, .input-row, .subtitle, #historySection { display: none !important; }
+            #historyList { max-height: none !important; }
+        }
+
+        @media (max-width: 768px) {
+            .history-table {
+                font-size: 0.8rem;
+            }
+            .history-table th,
+            .history-table td {
+                padding: 8px 4px;
+            }
         }
     </style>
 </head>
@@ -295,13 +414,17 @@
         <h1>Sticker Audit Log</h1>
         <div class="subtitle">Enter counts, press Enter or click Add to log.</div>
 
-        <div id="historySection" style="margin-bottom: 25px; padding: 15px; background: #f1f5f9; border-radius: 12px; border: 1px solid var(--border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">📋 RECENT ENTRIES (FROM SHEET)</span>
-                <button class="btn" onclick="fetchHistory()" style="padding: 4px 10px; font-size: 0.75rem;">🔄 Refresh</button>
+        <div id="historySection">
+            <div class="history-header">
+                <div class="history-title">📋 ALL RECORDS FROM GOOGLE SHEETS</div>
+                <div class="history-controls">
+                    <button class="btn btn-primary" onclick="fetchHistory()">🔄 Refresh</button>
+                    <button class="btn btn-success" onclick="exportAll()">📄 Export CSV</button>
+                </div>
             </div>
-            <div id="historyList" style="max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
-                <div style="text-align: center; color: var(--text-muted);">Click refresh to load history...</div>
+            <div class="record-count" id="recordCount" style="display: none;"></div>
+            <div id="historyList">
+                <div class="loading">Click refresh to load ALL records from Google Sheets...</div>
             </div>
         </div>
 
@@ -323,13 +446,6 @@
             <button class="btn btn-success" id="saveBtn" onclick="saveToGoogleSheets()" style="background: #10b981; color: white; border-color: #10b981;">☁️ Save to Sheets</button>
         </div>
     </div>
-</div>
-
-<div style="margin-top: 25px;">
-  <div id="detailedSummaryContainer" style="display:none; margin-top:15px; padding-bottom: 50px;">
-    <div class="summary-title" style="color: var(--text-main);">🛠️ Manage Entries</div>
-    <div id="detailedSummary"></div>
-  </div>
 </div>
 
 <script>
@@ -368,46 +484,102 @@
         `;
     });
 
-    // --- FETCH HISTORY ---
+    // --- FETCH HISTORY - SHOWS ALL RECORDS ---
     function fetchHistory() {
-    const historyList = document.getElementById('historyList');
-    historyList.innerHTML = '<div style="text-align:center;">⌛ Loading history...</div>';
+        const historyList = document.getElementById('historyList');
+        const recordCount = document.getElementById('recordCount');
+        
+        historyList.innerHTML = '<div class="loading">⌛ Loading ALL records from Google Sheets...</div>';
+        recordCount.style.display = 'none';
 
-    // Added cache-buster to ensure you get fresh data
-    const fetchUrl = WEB_APP_URL + "?action=read&t=" + new Date().getTime();
+        const fetchUrl = WEB_APP_URL + "?action=read&t=" + new Date().getTime();
 
-    fetch(fetchUrl)
-    .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === "success") {
-            if (!data.records || data.records.length === 0) {
-                historyList.innerHTML = '<div style="text-align:center;">No records found in sheet.</div>';
-                return;
+        fetch(fetchUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === "success") {
+                if (!data.records || data.records.length === 0) {
+                    historyList.innerHTML = '<div class="loading">No records found in Google Sheets.</div>';
+                    return;
+                }
+
+                // SHOW ALL RECORDS - NO LIMIT!
+                let html = `
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Date</th>
+                                <th style="width: 50%;">Product</th>
+                                <th style="width: 20%;">Count</th>
+                                <th style="width: 10%;">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.records.forEach((rec, index) => {
+                    let dateStr = rec.date ? rec.date.split('T')[0] : 'N/A';
+                    let productName = rec.product || 'N/A';
+                    let count = rec.count || 0;
+                    let rowId = rec.rowId || index + 1;
+                    
+                    html += `
+                        <tr>
+                            <td style="font-weight: 500; color: var(--text-main);">${dateStr}</td>
+                            <td style="font-weight: 600; color: #0f172a;">${productName}</td>
+                            <td style="text-align: right; font-weight: 700; color: var(--success-dark);">${count}</td>
+                            <td style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">${rowId}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                `;
+                
+                historyList.innerHTML = html;
+                
+                // Show record count
+                recordCount.textContent = `Total Records: ${data.records.length}`;
+                recordCount.style.display = 'inline-block';
+                
+            } else {
+                throw new Error(data.message || 'Unknown error');
             }
-            let html = '<table style="width:100%; border-collapse: collapse;">';
-            data.records.slice(0, 10).forEach(rec => {
-                // Handle cases where date might be a string or object
-                let dateStr = rec.date ? rec.date.split('T')[0] : 'N/A';
-                html += `<tr style="border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 6px 0; color: #64748b;">${dateStr}</td>
-                            <td style="padding: 6px 0; font-weight:600;">${rec.product}</td>
-                            <td style="padding: 6px 0; text-align:right;">${rec.count}</td>
-                         </tr>`;
-            });
-            html += '</table>';
-            historyList.innerHTML = html;
-        } else {
-            throw new Error(data.message || 'Unknown error');
-        }
-    })
-    .catch(err => {
-        console.error("Fetch Error:", err);
-        historyList.innerHTML = `<div style="text-align:center; color:red; font-size: 0.7rem;">⚠️ Load Failed: ${err.message}</div>`;
-    });
-}
+        })
+        .catch(err => {
+            console.error("Fetch Error:", err);
+            historyList.innerHTML = `<div class="error">⚠️ Failed to load records: ${err.message}</div>`;
+        });
+    }
+
+    // Export all records as CSV
+    function exportAll() {
+        fetch(WEB_APP_URL + "?action=read")
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success" && data.records) {
+                let csv = 'Date,Product,Count\n';
+                data.records.forEach(rec => {
+                let dateStr = rec.date ? rec.date.split('T')[0] : '';
+                csv += `"${dateStr}","${rec.product || ''}",${rec.count || 0}\n`;
+                });
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sticker-audit-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }
+        })
+        .catch(() => alert('Failed to export.'));
+    }
 
     function enterItem(id) {
         const dateInput = document.getElementById(`date${id}`).value;
@@ -450,10 +622,10 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.result === "success" || data.status === "success") {
+            if (data.status === "success") {
                 alert("✅ Successfully saved to Google Sheets!");
                 clearAll();
-                fetchHistory();
+                fetchHistory(); // Refresh to show new records
             } else {
                 alert("❌ Error: " + (data.error || "Unknown error"));
             }
@@ -468,87 +640,102 @@
     }
 
     // --- ADDITIONAL FUNCTIONS ---
-
-function calculateGrandTotal() {
-    let totalCount = 0;
-    Object.values(summaryData).forEach(entries => {
-        entries.forEach(entry => {
-            totalCount += entry.count;
+    function calculateGrandTotal() {
+        let totalCount = 0;
+        Object.values(summaryData).forEach(entries => {
+            entries.forEach(entry => {
+                totalCount += entry.count;
+            });
         });
-    });
-    document.getElementById('grandTotal').innerText = `GRAND TOTAL: ${totalCount} STICKERS`;
-}
-
-function updateSummary() {
-    const summaryList = document.getElementById('summaryList');
-    summaryList.innerHTML = '';
-    for (const key in summaryData) {
-        summaryData[key].forEach((entry, index) => {
-            const div = document.createElement('div');
-            div.className = 'summary-item';
-            div.innerHTML = `
-                ${entry.product} - ${entry.date} - Count: ${entry.count}
-                <button style="border:none; background:none; color:${getComputedStyle(document.documentElement).getPropertyValue('--danger')}; cursor:pointer;" onclick="deleteEntry('${key}', ${index})">🗑️</button>
-            `;
-            summaryList.appendChild(div);
-        });
+        document.getElementById('grandTotal').innerText = `GRAND TOTAL: ${totalCount} STICKERS`;
     }
-}
 
-function showSummary() {
-    document.getElementById('summarySection').style.display = 'block';
-}
+    function updateSummary() {
+        const summaryList = document.getElementById('summaryList');
+        summaryList.innerHTML = '';
+        for (const key in summaryData) {
+            if (summaryData[key].length > 0) {
+                const productName = summaryData[key][0].product;
+                const div = document.createElement('div');
+                div.className = 'summary-product';
+                let productTotal = 0;
+                let itemsHtml = '';
+                
+                summaryData[key].forEach((entry, index) => {
+                    productTotal += entry.count;
+                    itemsHtml += `
+                        <div class="summary-item">
+                            <span>${entry.date} - Count: ${entry.count}</span>
+                            <button style="border:none; background:none; color:var(--danger); cursor:pointer; font-size:1rem;" onclick="deleteEntry('${key}', ${index})" title="Delete">🗑️</button>
+                        </div>
+                    `;
+                });
+                
+                div.innerHTML = `
+                    <div class="product-header">
+                        <span>${productName}</span>
+                        <span>Total: ${productTotal}</span>
+                    </div>
+                    ${itemsHtml}
+                    <div class="product-total">Product Total: ${productTotal}</div>
+                `;
+                summaryList.appendChild(div);
+            }
+        }
+    }
 
-function toggleSummary() {
-    const section = document.getElementById('summarySection');
-    section.style.display = section.style.display === 'none' ? 'block' : 'none';
-}
+    function showSummary() {
+        document.getElementById('summarySection').style.display = 'block';
+    }
 
-function clearAll() {
-    summaryData = {};
-    updateSummary();
-    calculateGrandTotal();
-    document.querySelectorAll('.status').forEach(el => {
-        el.style.display = 'none';
-        el.innerHTML = '';
-    });
-}
+    function toggleSummary() {
+        const section = document.getElementById('summarySection');
+        section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
 
-function copySummary() {
-    const summaryText = Object.values(summaryData).flat().map(entry => 
-        `${entry.product} (${entry.date}): ${entry.count}`
-    ).join('\n');
-
-    navigator.clipboard.writeText(summaryText)
-        .then(() => alert('Copied summary to clipboard!'))
-        .catch(() => alert('Failed to copy.'));
-}
-
-function toggleDetailedSummary() {
-    const container = document.getElementById('detailedSummaryContainer');
-    container.style.display = container.style.display === 'none' ? 'block' : 'none';
-}
-
-function updateEntry(key, index, newData) {
-    if (summaryData[key] && summaryData[key][index]) {
-        summaryData[key][index] = { ...summaryData[key][index], ...newData };
+    function clearAll() {
+        summaryData = {};
         updateSummary();
         calculateGrandTotal();
+        document.querySelectorAll('.status').forEach(el => {
+            el.style.display = 'none';
+            el.innerHTML = '';
+        });
+        document.getElementById('summarySection').style.display = 'none';
     }
-}
 
-function deleteEntry(key, index) {
-    if (summaryData[key] && summaryData[key][index]) {
-        summaryData[key].splice(index, 1);
-        if (summaryData[key].length === 0) delete summaryData[key];
-        updateSummary();
-        calculateGrandTotal();
+    function copySummary() {
+        const summaryText = Object.values(summaryData).flat().map(entry => 
+            `${entry.product} (${entry.date}): ${entry.count}`
+        ).join('\n');
+
+        navigator.clipboard.writeText(summaryText)
+            .then(() => alert('✅ Summary copied to clipboard!'))
+            .catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = summaryText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Summary copied to clipboard!');
+            });
     }
-}
 
-// Initialize history on load
-window.onload = fetchHistory;
+    function deleteEntry(key, index) {
+        if (summaryData[key] && summaryData[key][index]) {
+            summaryData[key].splice(index, 1);
+            if (summaryData[key].length === 0) delete summaryData[key];
+            updateSummary();
+            calculateGrandTotal();
+        }
+    }
+
+    // Initialize on load
+    window.onload = function() {
+        fetchHistory();
+    };
 </script>
 </body>
 </html>
-
