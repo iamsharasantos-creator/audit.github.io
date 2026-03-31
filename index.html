@@ -311,6 +311,7 @@
             <button class="btn btn-primary" onclick="toggleSummary()">📋 Toggle Summary</button>
             <button class="btn btn-primary" onclick="copySummary()">📄 Copy Summary</button>
             <button class="btn btn-primary" onclick="toggleDetailedSummary()">📝 Edit All Entries</button>
+            <button class="btn btn-success" id="saveBtn" onclick="saveToGoogleSheets()" style="background: #10b981; color: white; border-color: #10b981;">☁️ Save to Sheets</button>
         </div>
     </div>
 </div>
@@ -577,6 +578,53 @@ function deleteEntry(itemKey, index) {
         updateSummary();
         populateDetailedSummary();
     }
+}
+    // --- GOOGLE SHEETS BACKEND INTEGRATION ---
+
+// Replace this URL with the one you copied in Step 3!
+const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
+
+function saveToGoogleSheets() {
+    // Check if there is data to save
+    if (Object.keys(summaryData).length === 0) {
+        alert("⚠️ No data to save!");
+        return;
+    }
+
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.innerText = "⏳ Saving...";
+    saveBtn.disabled = true;
+
+    // Send the data to Google Apps Script
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        // Using text/plain prevents complex CORS preflight issues with Google Apps Script
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8", 
+        },
+        body: JSON.stringify(summaryData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result === "success") {
+            alert("✅ Successfully saved to Google Sheets!");
+            // Optional: Ask if they want to clear the screen after a successful save
+            if (confirm("Data saved! Would you like to clear the current entries?")) {
+                clearAll();
+            }
+        } else {
+            alert("❌ Database error: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("❌ Failed to reach the server. Check your connection.");
+    })
+    .finally(() => {
+        // Reset button state
+        saveBtn.innerText = "☁️ Save to Sheets";
+        saveBtn.disabled = false;
+    });
 }
 </script>
 
