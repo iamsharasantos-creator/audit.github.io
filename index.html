@@ -370,33 +370,44 @@
 
     // --- FETCH HISTORY ---
     function fetchHistory() {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '<div style="text-align:center;">⌛ Loading history...</div>';
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '<div style="text-align:center;">⌛ Loading history...</div>';
 
-        fetch(WEB_APP_URL)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "success") {
-                if (data.records.length === 0) {
-                    historyList.innerHTML = '<div style="text-align:center;">No records found in sheet.</div>';
-                    return;
-                }
-                let html = '<table style="width:100%; border-collapse: collapse;">';
-                data.records.slice(0, 10).forEach(rec => {
-                    html += `<tr style="border-bottom: 1px solid #e2e8f0;">
-                                <td style="padding: 4px 0; color: #64748b;">${rec.date.split('T')[0]}</td>
-                                <td style="padding: 4px 0; font-weight:600;">${rec.product}</td>
-                                <td style="padding: 4px 0; text-align:right;">${rec.count}</td>
-                             </tr>`;
-                });
-                html += '</table>';
-                historyList.innerHTML = html;
+    // Added cache-buster to ensure you get fresh data
+    const fetchUrl = WEB_APP_URL + "?action=read&t=" + new Date().getTime();
+
+    fetch(fetchUrl)
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === "success") {
+            if (!data.records || data.records.length === 0) {
+                historyList.innerHTML = '<div style="text-align:center;">No records found in sheet.</div>';
+                return;
             }
-        })
-        .catch(err => {
-            historyList.innerHTML = '<div style="text-align:center; color:red;">⚠️ Failed to load history</div>';
-        });
-    }
+            let html = '<table style="width:100%; border-collapse: collapse;">';
+            data.records.slice(0, 10).forEach(rec => {
+                // Handle cases where date might be a string or object
+                let dateStr = rec.date ? rec.date.split('T')[0] : 'N/A';
+                html += `<tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 6px 0; color: #64748b;">${dateStr}</td>
+                            <td style="padding: 6px 0; font-weight:600;">${rec.product}</td>
+                            <td style="padding: 6px 0; text-align:right;">${rec.count}</td>
+                         </tr>`;
+            });
+            html += '</table>';
+            historyList.innerHTML = html;
+        } else {
+            throw new Error(data.message || 'Unknown error');
+        }
+    })
+    .catch(err => {
+        console.error("Fetch Error:", err);
+        historyList.innerHTML = `<div style="text-align:center; color:red; font-size: 0.7rem;">⚠️ Load Failed: ${err.message}</div>`;
+    });
+}
 
     function enterItem(id) {
         const dateInput = document.getElementById(`date${id}`).value;
