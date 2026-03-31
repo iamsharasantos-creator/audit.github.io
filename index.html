@@ -295,6 +295,16 @@
         <h1>Sticker Audit Log</h1>
         <div class="subtitle">Enter counts, press Enter or click Add to log.</div>
 
+        <div id="historySection" style="margin-bottom: 25px; padding: 15px; background: #f1f5f9; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">📋 RECENT ENTRIES (FROM SHEET)</span>
+                <button class="btn" onclick="fetchHistory()" style="padding: 4px 10px; font-size: 0.75rem;">🔄 Refresh</button>
+            </div>
+            <div id="historyList" style="max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
+                <div style="text-align: center; color: var(--text-muted);">Click refresh to load history...</div>
+            </div>
+        </div>
+
         <div id="products-container"></div>
 
         <div class="grand-total" id="grandTotal">
@@ -302,7 +312,7 @@
         </div>
 
         <div class="summary-section" id="summarySection" style="display: none;">
-            <div class="summary-title">📊 Live Summary</div>
+            <div class="summary-title">📊 Live Summary (Unsaved)</div>
             <div id="summaryList"></div>
         </div>
 
@@ -310,7 +320,6 @@
             <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
             <button class="btn btn-primary" onclick="toggleSummary()">📋 Toggle Summary</button>
             <button class="btn btn-primary" onclick="copySummary()">📄 Copy Summary</button>
-            <button class="btn btn-primary" onclick="toggleDetailedSummary()">📝 Edit All Entries</button>
             <button class="btn btn-success" id="saveBtn" onclick="saveToGoogleSheets()" style="background: #10b981; color: white; border-color: #10b981;">☁️ Save to Sheets</button>
         </div>
     </div>
@@ -324,7 +333,6 @@
 </div>
 
 <script>
-    // Product List Array
     const productList = [
         "1 x SEAT COVER", "1 x MINI FLASHLIGHT", "1 x FULL FACE BALACLAVA",
         "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x SHOE CLEANER", "2 x FLASHLIGHT",
@@ -333,16 +341,15 @@
 
     let summaryData = {}; 
     let summaryVisible = false;
-
-    // Build standard date string (YYYY-MM-DD)
     const today = new Date().toISOString().split('T')[0];
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzMM60idR6QEYvznvh2ogYXDxSJ9552beS6rLFMNdhqRtqDh0zuOq4TwrHCJ8u5uKCFOA/exec";
 
-    // Dynamically generate product inputs
+    // Build Inputs
     const container = document.getElementById('products-container');
     productList.forEach((product, index) => {
         const id = index + 1;
         container.innerHTML += `
-            <div class="product-section">
+            <div class="product-section" id="productSection${id}">
                 <div class="product-line">${product}</div>
                 <div class="input-row">
                     <div class="input-group">
@@ -361,6 +368,36 @@
         `;
     });
 
+    // --- FETCH HISTORY ---
+    function fetchHistory() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '<div style="text-align:center;">⌛ Loading history...</div>';
+
+        fetch(WEB_APP_URL)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                if (data.records.length === 0) {
+                    historyList.innerHTML = '<div style="text-align:center;">No records found in sheet.</div>';
+                    return;
+                }
+                let html = '<table style="width:100%; border-collapse: collapse;">';
+                data.records.slice(0, 10).forEach(rec => {
+                    html += `<tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 4px 0; color: #64748b;">${rec.date.split('T')[0]}</td>
+                                <td style="padding: 4px 0; font-weight:600;">${rec.product}</td>
+                                <td style="padding: 4px 0; text-align:right;">${rec.count}</td>
+                             </tr>`;
+                });
+                html += '</table>';
+                historyList.innerHTML = html;
+            }
+        })
+        .catch(err => {
+            historyList.innerHTML = '<div style="text-align:center; color:red;">⚠️ Failed to load history</div>';
+        });
+    }
+
     function enterItem(id) {
         const dateInput = document.getElementById(`date${id}`).value;
         const countInput = document.getElementById(`count${id}`).value;
@@ -368,227 +405,21 @@
         const productName = productList[id - 1];
         const statusEl = document.getElementById(`status${id}`);
 
-        if (!dateInput) { alert('Please select a date first!'); return; }
-        if (count <= 0) { alert('Please enter a count greater than 0!'); return; }
+        if (!dateInput || count <= 0) return;
 
         if (!summaryData[`item${id}`]) { summaryData[`item${id}`] = []; }
-
-        summaryData[`item${id}`].push({
-            product: productName,
-            date: dateInput,
-            count: count
-        });
+        summaryData[`item${id}`].push({ product: productName, date: dateInput, count: count });
 
         const productTotal = summaryData[`item${id}`].reduce((sum, entry) => sum + entry.count, 0);
-        
         statusEl.innerHTML = `<span>✅ Added ${count}</span> <span>| Total: ${productTotal}</span>`;
-        statusEl.style.display = 'block';
+        statusEl.style.display = 'flex';
         statusEl.className = 'status sent';
 
-        // Clear number input for the next entry
         document.getElementById(`count${id}`).value = '';
-
         calculateGrandTotal();
         updateSummary();
         showSummary(); 
     }
-
-    function calculateGrandTotal() {
-        let grandTotal = 0;
-        Object.values(summaryData).forEach(entries => {
-            entries.forEach(entry => grandTotal += entry.count);
-        });
-        document.getElementById('grandTotal').textContent = `GRAND TOTAL: ${grandTotal} STICKERS`;
-    }
-
-    function updateSummary() {
-        const summaryList = document.getElementById('summaryList');
-        let summaryHTML = '';
-
-        Object.keys(summaryData).forEach(key => {
-            const entries = summaryData[key];
-            if (entries.length > 0) {
-                const productName = entries[0].product;
-                const productTotal = entries.reduce((sum, entry) => sum + entry.count, 0);
-
-                summaryHTML += `
-                    <div class="summary-product">
-                        <div class="product-header">
-                            <span>${productName}</span>
-                            <span>Total: ${productTotal}</span>
-                        </div>
-                `;
-
-                entries.forEach(entry => {
-                    summaryHTML += `
-                        <div class="summary-item">
-                            <span>📅 ${entry.date}</span>
-                            <span>${entry.count} stickers</span>
-                        </div>
-                    `;
-                });
-
-                summaryHTML += `
-                        <div class="product-total">
-                            🏆 Current Total: ${productTotal} Stickers
-                        </div>
-                    </div>
-                `;
-            }
-        });
-
-        summaryList.innerHTML = summaryHTML || '<div style="text-align:center;color:#64748b;padding:20px;">No entries yet. Add some data above!</div>';
-    }
-
-    function showSummary() {
-        summaryVisible = true;
-        document.getElementById('summarySection').style.display = 'block';
-        updateSummary();
-    }
-
-    function toggleSummary() {
-        summaryVisible = !summaryVisible;
-        document.getElementById('summarySection').style.display = summaryVisible ? 'block' : 'none';
-        if (summaryVisible) updateSummary();
-    }
-
-    function clearAll() {
-        if (!confirm('Clear ALL entries? This cannot be undone!')) return;
-        
-        summaryData = {};
-        for(let i = 1; i <= productList.length; i++) {
-            document.getElementById(`date${i}`).value = today;
-            document.getElementById(`count${i}`).value = '';
-            document.getElementById(`status${i}`).style.display = 'none';
-            document.getElementById(`status${i}`).className = 'status';
-        }
-        document.getElementById('grandTotal').textContent = 'GRAND TOTAL: 0 STICKERS';
-        document.getElementById('summarySection').style.display = 'none';
-        summaryVisible = false;
-        document.getElementById('summaryList').innerHTML = '';
-        
-        if(document.getElementById('detailedSummaryContainer').style.display === 'block') {
-            populateDetailedSummary();
-        }
-    }
-
-    function copySummary() {
-        let textOutput = '';
-        Object.keys(summaryData).forEach(key => {
-            const entries = summaryData[key];
-            if (entries.length > 0) {
-                const productName = entries[0].product;
-                const productTotal = entries.reduce((sum, entry) => sum + entry.count, 0);
-                textOutput += `${productName}\n`;
-                entries.forEach(entry => { textOutput += `${entry.date} - ${entry.count}\n`; });
-                textOutput += `TOTAL = ${productTotal}\n\n`;
-            }
-        });
-
-        if (!textOutput) { alert("No data to copy!"); return; }
-
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(textOutput)
-                .then(() => alert("✅ Summary copied to clipboard!"))
-                .catch(err => fallbackCopyTextToClipboard(textOutput));
-        } else {
-            fallbackCopyTextToClipboard(textOutput);
-        }
-    }
-
-    function fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            if (document.execCommand('copy')) alert("✅ Summary copied to clipboard!");
-            else alert("❌ Failed to copy! Please select and copy manually.");
-        } catch (err) {
-            alert("❌ Failed to copy! Please select and copy manually.");
-        }
-        document.body.removeChild(textArea);
-    }
-    
-    function toggleDetailedSummary() {
-        const container = document.getElementById('detailedSummaryContainer');
-        if (container.style.display === 'none') {
-            populateDetailedSummary();
-            container.style.display = 'block';
-            // Scroll down so the user can see it
-            container.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            container.style.display = 'none';
-        }
-    }
-
-    function populateDetailedSummary() {
-        const container = document.getElementById('detailedSummary');
-        let html = '';
-
-        Object.keys(summaryData).forEach(key => {
-            const entries = summaryData[key];
-            if (entries.length > 0) {
-                // UI Fix: Show the product name so the user knows what they are editing
-                html += `<div class="product-section" style="margin-bottom:15px; padding:15px; background: white; max-width: 600px; margin-left: auto; margin-right: auto;">`;
-                html += `<div style="font-weight: 700; color: #0f172a; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px;">${entries[0].product}</div>`;
-                
-                entries.forEach((entry, index) => {
-                    html += `
-                    <div style="display:flex; gap:10px; align-items:center; margin-bottom: 8px;">
-                        <input type="date" value="${entry.date}" style="flex:1;" onchange="updateEntry('${key}', ${index}, 'date', this.value)">
-                        <input type="number" value="${entry.count}" style="width:80px;" min="1" onchange="updateEntry('${key}', ${index}, 'count', this.value)">
-                        <button class="btn btn-danger" style="padding: 10px;" onclick="deleteEntry('${key}', ${index})" title="Delete Entry">🗑️</button>
-                    </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-        });
-        
-        if (!html) {
-            html = '<div style="text-align:center; color:#64748b; padding:20px;">No entries to manage.</div>';
-        }
-        container.innerHTML = html;
-    }
-
-    function updateEntry(itemKey, index, field, value) {
-        if (summaryData[itemKey] && summaryData[itemKey][index]) {
-            if (field === 'date') {
-                summaryData[itemKey][index].date = value;
-            } else if (field === 'count') {
-                const num = parseInt(value);
-                if (!isNaN(num) && num > 0) {
-                    summaryData[itemKey][index].count = num;
-                } else {
-                    alert('Count must be a number greater than 0.');
-                    populateDetailedSummary();
-                    return;
-                }
-            }
-            calculateGrandTotal();
-            updateSummary();
-            // We intentionally don't call populateDetailedSummary() here 
-            // so we don't lose focus on the input box while editing.
-        }
-    }
-
-    function deleteEntry(itemKey, index) {
-        if (summaryData[itemKey]) {
-            summaryData[itemKey].splice(index, 1);
-            if (summaryData[itemKey].length === 0) delete summaryData[itemKey];
-            calculateGrandTotal();
-            updateSummary();
-            populateDetailedSummary();
-        }
-    }
-
-    // --- GOOGLE SHEETS BACKEND INTEGRATION ---
-
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzGWjq5203tOAJcDdSeIP58lYTNIELRqbOzzeT6adDX/dev";
 
     function saveToGoogleSheets() {
         if (Object.keys(summaryData).length === 0) {
@@ -602,33 +433,111 @@
 
         fetch(WEB_APP_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8", 
-            },
-            redirect: "follow", // <-- Crucial FIX for Google Apps Script redirects
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            redirect: "follow",
             body: JSON.stringify(summaryData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.result === "success" || data.status === "success") {
                 alert("✅ Successfully saved to Google Sheets!");
-                if (confirm("Data saved! Would you like to clear the current entries?")) {
-                    clearAll();
-                }
+                clearAll();
+                fetchHistory();
             } else {
-                alert("❌ Database error: " + (data.error || "Unknown error"));
+                alert("❌ Error: " + (data.error || "Unknown error"));
             }
         })
         .catch(error => {
-            console.error("Error:", error);
-            alert("❌ Failed to reach the server. Check your connection or deployment URL.");
+            alert("❌ Failed to reach the server.");
         })
         .finally(() => {
             saveBtn.innerText = "☁️ Save to Sheets";
             saveBtn.disabled = false;
         });
     }
-</script>
 
+    // --- ADDITIONAL FUNCTIONS ---
+
+function calculateGrandTotal() {
+    let totalCount = 0;
+    Object.values(summaryData).forEach(entries => {
+        entries.forEach(entry => {
+            totalCount += entry.count;
+        });
+    });
+    document.getElementById('grandTotal').innerText = `GRAND TOTAL: ${totalCount} STICKERS`;
+}
+
+function updateSummary() {
+    const summaryList = document.getElementById('summaryList');
+    summaryList.innerHTML = '';
+    for (const key in summaryData) {
+        summaryData[key].forEach((entry, index) => {
+            const div = document.createElement('div');
+            div.className = 'summary-item';
+            div.innerHTML = `
+                ${entry.product} - ${entry.date} - Count: ${entry.count}
+                <button style="border:none; background:none; color:${getComputedStyle(document.documentElement).getPropertyValue('--danger')}; cursor:pointer;" onclick="deleteEntry('${key}', ${index})">🗑️</button>
+            `;
+            summaryList.appendChild(div);
+        });
+    }
+}
+
+function showSummary() {
+    document.getElementById('summarySection').style.display = 'block';
+}
+
+function toggleSummary() {
+    const section = document.getElementById('summarySection');
+    section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+function clearAll() {
+    summaryData = {};
+    updateSummary();
+    calculateGrandTotal();
+    document.querySelectorAll('.status').forEach(el => {
+        el.style.display = 'none';
+        el.innerHTML = '';
+    });
+}
+
+function copySummary() {
+    const summaryText = Object.values(summaryData).flat().map(entry => 
+        `${entry.product} (${entry.date}): ${entry.count}`
+    ).join('\n');
+
+    navigator.clipboard.writeText(summaryText)
+        .then(() => alert('Copied summary to clipboard!'))
+        .catch(() => alert('Failed to copy.'));
+}
+
+function toggleDetailedSummary() {
+    const container = document.getElementById('detailedSummaryContainer');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateEntry(key, index, newData) {
+    if (summaryData[key] && summaryData[key][index]) {
+        summaryData[key][index] = { ...summaryData[key][index], ...newData };
+        updateSummary();
+        calculateGrandTotal();
+    }
+}
+
+function deleteEntry(key, index) {
+    if (summaryData[key] && summaryData[key][index]) {
+        summaryData[key].splice(index, 1);
+        if (summaryData[key].length === 0) delete summaryData[key];
+        updateSummary();
+        calculateGrandTotal();
+    }
+}
+
+// Initialize history on load
+window.onload = fetchHistory;
+</script>
 </body>
 </html>
+
