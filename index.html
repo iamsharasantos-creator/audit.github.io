@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticker Audit Log - Fast Entry</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --success-dark: #047857;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            padding: 30px 15px;
+            min-height: 100vh;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .audit-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 5px;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .product-section {
+            margin-bottom: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        .product-section:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: #fff;
+        }
+
+        .product-line {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0f172a;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        input[type="date"], input[type="number"] {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="date"] {
+            min-width: 150px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            font-weight: 600;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .enter-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            align-self: flex-end;
+            transition: background-color 0.2s;
+        }
+
+        .enter-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .status.sent {
+            background: var(--success-light);
+            color: var(--success-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .grand-total {
+            font-size: 1.4rem;
+            margin: 30px 0 20px 0;
+            background: #0f172a;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+        }
+
+        /* SUMMARY STYLES */
+        .summary-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .summary-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 15px;
+        }
+
+        .summary-product {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .product-header {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            margin: 2px 0;
+            background: #f8fafc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .product-total {
+            font-weight: 700;
+            color: var(--success-dark);
+            background: var(--success-light);
+            padding: 6px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        /* ACTION BUTTONS */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .audit-box { box-shadow: none; padding: 0; }
+            .summary-section { max-height: none; }
+            .btn, .enter-btn, .input-row, .subtitle { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="audit-box">
+        <h1>Sticker Audit Log</h1>
+        <div class="subtitle">Enter counts, press Enter or click Add to log.</div>
+
+        <div id="products-container"></div>
+
+        <div class="grand-total" id="grandTotal">
+            GRAND TOTAL: 0 STICKERS
+        </div>
+
+        <div class="summary-section" id="summarySection" style="display: none;">
+            <div class="summary-title">📊 Live Summary</div>
+            <div id="summaryList"></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+            <button class="btn btn-primary" onclick="toggleSummary()">📋 Toggle Summary</button>
+            <button class="btn btn-primary" onclick="copySummary()">📄 Copy Summary</button>
+            <button class="btn btn-primary" onclick="toggleDetailedSummary()">📝 Edit All Entries</button>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 25px;">
+  <div id="detailedSummaryContainer" style="display:none; margin-top:15px;">
+    <div class="summary-title">🛠️ Manage Entries</div>
+    <div id="detailedSummary"></div>
+  </div>
+</div>
+
+<script>
+    // Product List Array
+    const productList = [
+        "1 x SEAT COVER", "1 x MINI FLASHLIGHT", "1 x FULL FACE BALACLAVA",
+        "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x SHOE CLEANER", "2 x FLASHLIGHT",
+        "2 x MINI FLASHLIGHT", "1 x PANTY STOCKINGS", "1 x MAGIC MESH", "2 x ANTI - PULGAS","1 x MAGIC TOWEL"
+    ];
+
+    let summaryData = {}; 
+    let summaryVisible = false;
+
+    // Build standard date string (YYYY-MM-DD)
+    const today = new Date().toISOString().split('T')[0];
+
+    // Dynamically generate product inputs
+    const container = document.getElementById('products-container');
+    productList.forEach((product, index) => {
+        const id = index + 1;
+        container.innerHTML += `
+            <div class="product-section">
+                <div class="product-line">${product}</div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Date</label>
+                        <input type="date" id="date${id}" value="${today}">
+                    </div>
+                    <div class="input-group">
+                        <label>Count</label>
+                        <input type="number" id="count${id}" placeholder="0" min="1" 
+                               onkeydown="if(event.key==='Enter') enterItem(${id})">
+                    </div>
+                    <button class="enter-btn" onclick="enterItem(${id})">Add</button>
+                </div>
+                <div class="status" id="status${id}"></div>
+            </div>
+        `;
+    });
+
+    function enterItem(id) {
+        const dateInput = document.getElementById(`date${id}`).value;
+        const countInput = document.getElementById(`count${id}`).value;
+        const count = parseInt(countInput) || 0;
+        const productName = productList[id - 1];
+        const statusEl = document.getElementById(`status${id}`);
+
+        if (!dateInput) { alert('Please select a date first!'); return; }
+        if (count <= 0) { alert('Please enter a count greater than 0!'); return; }
+
+        if (!summaryData[`item${id}`]) { summaryData[`item${id}`] = []; }
+
+        summaryData[`item${id}`].push({
+            product: productName,
+            date: dateInput,
+            count: count
+        });
+
+        const productTotal = summaryData[`item${id}`].reduce((sum, entry) => sum + entry.count, 0);
+        
+        statusEl.innerHTML = `<span>✅ Added ${count}</span> <span>| Total: ${productTotal}</span>`;
+        statusEl.className = 'status sent';
+
+        // Clear number input for the next entry
+        document.getElementById(`count${id}`).value = '';
+
+        calculateGrandTotal();
+        updateSummary();
+        showSummary(); 
+    }
+
+    function calculateGrandTotal() {
+        let grandTotal = 0;
+        Object.values(summaryData).forEach(entries => {
+            entries.forEach(entry => grandTotal += entry.count);
+        });
+        document.getElementById('grandTotal').textContent = `GRAND TOTAL: ${grandTotal} STICKERS`;
+    }
+
+    function updateSummary() {
+        const summaryList = document.getElementById('summaryList');
+        let summaryHTML = '';
+
+        Object.keys(summaryData).forEach(key => {
+            const entries = summaryData[key];
+            if (entries.length > 0) {
+                const productName = entries[0].product;
+                const productTotal = entries.reduce((sum, entry) => sum + entry.count, 0);
+
+                summaryHTML += `
+                    <div class="summary-product">
+                        <div class="product-header">
+                            <span>${productName}</span>
+                            <span>Total: ${productTotal}</span>
+                        </div>
+                `;
+
+                entries.forEach(entry => {
+                    summaryHTML += `
+                        <div class="summary-item">
+                            <span>📅 ${entry.date}</span>
+                            <span>${entry.count} stickers</span>
+                        </div>
+                    `;
+                });
+
+                summaryHTML += `
+                        <div class="product-total">
+                            🏆 Current Total: ${productTotal} Stickers
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        summaryList.innerHTML = summaryHTML || '<div style="text-align:center;color:#64748b;padding:20px;">No entries yet. Add some data above!</div>';
+    }
+
+    function showSummary() {
+        summaryVisible = true;
+        document.getElementById('summarySection').style.display = 'block';
+        updateSummary();
+    }
+
+    function toggleSummary() {
+        summaryVisible = !summaryVisible;
+        document.getElementById('summarySection').style.display = summaryVisible ? 'block' : 'none';
+        if (summaryVisible) updateSummary();
+    }
+
+    function clearAll() {
+        if (!confirm('Clear ALL entries? This cannot be undone!')) return;
+        
+        summaryData = {};
+        for(let i = 1; i <= productList.length; i++) {
+            document.getElementById(`date${i}`).value = today;
+            document.getElementById(`count${i}`).value = '';
+            document.getElementById(`status${i}`).style.display = 'none';
+            document.getElementById(`status${i}`).className = 'status';
+        }
+        document.getElementById('grandTotal').textContent = 'GRAND TOTAL: 0 STICKERS';
+        document.getElementById('summarySection').style.display = 'none';
+        summaryVisible = false;
+        document.getElementById('summaryList').innerHTML = '';
+    }
+
+    function printAudit() { window.print(); }
+
+    function copySummary() {
+        let textOutput = '';
+        Object.keys(summaryData).forEach(key => {
+            const entries = summaryData[key];
+            if (entries.length > 0) {
+                const productName = entries[0].product;
+                const productTotal = entries.reduce((sum, entry) => sum + entry.count, 0);
+                textOutput += `${productName}\n`;
+                entries.forEach(entry => { textOutput += `${entry.date} - ${entry.count}\n`; });
+                textOutput += `TOTAL = ${productTotal}\n\n`;
+            }
+        });
+
+        if (!textOutput) { alert("No data to copy!"); return; }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(textOutput)
+                .then(() => alert("✅ Summary copied to clipboard!"))
+                .catch(err => fallbackCopyTextToClipboard(textOutput));
+        } else {
+            fallbackCopyTextToClipboard(textOutput);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            if (document.execCommand('copy')) alert("✅ Summary copied to clipboard!");
+            else alert("❌ Failed to copy! Please select and copy manually.");
+        } catch (err) {
+            alert("❌ Failed to copy! Please select and copy manually.");
+        }
+        document.body.removeChild(textArea);
+    }
+    
+    function toggleDetailedSummary() {
+    const container = document.getElementById('detailedSummaryContainer');
+    if (container.style.display === 'none') {
+        populateDetailedSummary();
+        container.style.display = 'block';
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+function populateDetailedSummary() {
+    const container = document.getElementById('detailedSummary');
+    let html = '';
+
+    Object.keys(summaryData).forEach(key => {
+        const entries = summaryData[key];
+        if (entries.length > 0) {
+            // For each entry, provide editing fields and delete button
+            entries.forEach((entry, index) => {
+                html += `
+                <div class="product-section" style="margin-bottom:10px; padding:10px;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="date" value="${entry.date}" style="flex:1;" onchange="updateEntry('${key}', ${index}, 'date', this.value)">
+                        <input type="number" value="${entry.count}" style="width:80px;" min="1" onchange="updateEntry('${key}', ${index}, 'count', this.value)">
+                        <button class="btn btn-danger" onclick="deleteEntry('${key}', ${index})">🗑️ Delete</button>
+                    </div>
+                </div>
+                `;
+            });
+        }
+    });
+    if (!html) {
+        html = '<div style="text-align:center; color:#64748b; padding:20px;">No entries to manage.</div>';
+    }
+    container.innerHTML = html;
+}
+
+function updateEntry(itemKey, index, field, value) {
+    if (summaryData[itemKey] && summaryData[itemKey][index]) {
+        if (field === 'date') {
+            summaryData[itemKey][index].date = value;
+        } else if (field === 'count') {
+            const num = parseInt(value);
+            if (!isNaN(num) && num > 0) {
+                summaryData[itemKey][index].count = num;
+            } else {
+                alert('Count must be a number greater than 0.');
+                // Revert to previous value
+                populateDetailedSummary();
+                return;
+            }
+        }
+        // Refresh the summary view
+        calculateGrandTotal();
+        updateSummary();
+        populateDetailedSummary();
+    }
+}
+
+function deleteEntry(itemKey, index) {
+    if (summaryData[itemKey]) {
+        summaryData[itemKey].splice(index, 1);
+        // Remove key if no entries left
+        if (summaryData[itemKey].length === 0) delete summaryData[itemKey];
+        calculateGrandTotal();
+        updateSummary();
+        populateDetailedSummary();
+    }
+}
+</script>
+
+</body>
+</html>
