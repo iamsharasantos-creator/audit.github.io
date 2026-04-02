@@ -3,739 +3,1201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sticker Audit Log - Fast Entry</title>
+    <title>Hold Sticker Logs</title>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --success-light: #ecfdf5;
-            --success-dark: #047857;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --primary: #4facfe;
+            --primary-dark: #00f2fe;
+            --success: #11998e;
+            --success-dark: #38ef7d;
+            --danger: #ff416c;
+            --danger-dark: #ff4b2b;
+            --warning: #f7b733;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --light-bg: #f8f9ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            padding: 30px 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
-            line-height: 1.5;
+            padding: 20px;
+            color: var(--dark);
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
-        .audit-box {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 5px;
-            letter-spacing: -0.025em;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-        }
-
-        .product-section {
-            margin-bottom: 12px;
-            padding: 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #f8fafc;
-            transition: all 0.2s ease;
-        }
-
-        .product-section:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-            background: #fff;
-        }
-
-        .product-line {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #0f172a;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        input[type="date"], input[type="number"] {
-            background: #fff;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-
-        input[type="date"] {
-            min-width: 150px;
-        }
-
-        input[type="number"] {
-            width: 100px;
-            font-weight: 600;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .enter-btn {
-            background: var(--primary);
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            align-self: flex-end;
-            transition: background-color 0.2s;
-        }
-
-        .enter-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .status {
-            margin-top: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
-            border-radius: 6px;
-            display: none;
-            font-weight: 500;
-        }
-
-        .status.sent {
-            background: var(--success-light);
-            color: var(--success-dark);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .grand-total {
-            font-size: 1.4rem;
-            margin: 30px 0 20px 0;
-            background: #0f172a;
-            color: #fff;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
-            border-radius: 12px;
-            font-weight: 700;
-            letter-spacing: 0.025em;
         }
 
-        /* HISTORY SECTION - ENHANCED */
-        #historySection {
-            margin-bottom: 25px;
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--light-bg);
+            border-bottom: 3px solid #e1e5e9;
+        }
+
+        .tab-btn {
+            flex: 1;
             padding: 20px;
-            background: #f1f5f9;
-            border-radius: 12px;
-            border: 2px solid var(--border);
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gray);
             position: relative;
         }
 
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .history-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .history-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background: #fff;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            border-color: var(--primary-hover);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-
-        .btn-success:hover {
-            background: var(--success-dark);
-        }
-
-        #historyList {
-            max-height: 300px;
-            overflow-y: auto;
-            font-size: 0.88rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+        .tab-btn.active {
+            color: var(--primary);
             background: white;
         }
 
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 400px;
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         }
 
-        .history-table th {
-            background: var(--primary);
-            color: white;
-            padding: 12px 8px;
-            text-align: left;
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .add-section {
+            padding: 30px;
+            background: var(--light-bg);
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
             font-weight: 600;
-            font-size: 0.85rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            color: var(--dark);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .history-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: top;
-        }
-
-        .history-table tr:hover {
-            background: #f8fafc;
-        }
-
-        .record-count {
-            background: var(--success-light);
-            color: var(--success-dark);
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-        }
-
-        .error {
-            text-align: center;
-            padding: 20px;
-            color: var(--danger);
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-
-        /* SUMMARY STYLES */
-        .summary-section {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8fafc;
-            border: 1px solid var(--border);
+        .form-group input {
+            padding: 14px 18px;
+            border: 2px solid #e1e5e9;
             border-radius: 12px;
-            max-height: 400px;
-            overflow-y: auto;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
         }
 
-        .summary-title {
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #0f172a;
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
+        }
+
+        .dropdown-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .dropdown-container.show {
+            max-height: 300px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 14px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item.selected {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.08), rgba(0, 242, 254, 0.08));
+            color: var(--primary);
+            padding-left: 24px;
+            transform: translateX(4px);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            height: 52px;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .add-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .add-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cancel-btn {
+            background: #e1e5e9;
+            color: var(--dark);
+            height: 52px;
+            display: none;
+        }
+
+        .cancel-btn:hover {
+            background: #d1d5d9;
+        }
+
+        .cancel-btn.visible {
+            display: inline-flex;
+        }
+
+        .logs-section, .summary-section {
+            padding: 30px;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            min-width: 140px;
+        }
+
+        .stat-card div {
+            font-size: 1.5em;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-group input {
+            padding: 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            width: 350px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
+        }
+
+        .global-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .global-btn {
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        .btn-copy-all { background: var(--dark); }
+        .btn-export { background: var(--success); }
+        .btn-clear-all { background: var(--danger); }
+
+        .logs, .summary-table-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .logs::-webkit-scrollbar,
+        .summary-table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .logs::-webkit-scrollbar-track,
+        .summary-table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .logs::-webkit-scrollbar-thumb,
+        .summary-table-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .log-item {
+            background: white;
+            border: 2px solid #f0f2f5;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .log-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 15px;
         }
 
-        .summary-product {
-            margin-bottom: 12px;
-            padding: 12px;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .product-header {
+        .item-name {
+            font-size: 1.4em;
             font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
+            color: var(--dark);
         }
 
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 8px;
-            margin: 2px 0;
-            background: #f8fafc;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .product-total {
+        .quantity {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-weight: 700;
-            color: var(--success-dark);
-            background: var(--success-light);
-            padding: 6px;
-            border-radius: 6px;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            text-align: right;
+            font-size: 1.1em;
         }
 
-        /* ACTION BUTTONS */
+        .log-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
         .action-buttons {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 25px;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 15px;
         }
 
-        .btn-danger {
-            color: var(--danger);
+        .action-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .btn-danger:hover {
-            background: #fef2f2;
-            border-color: #fecaca;
+        .edit-btn { 
+            background: var(--primary); 
+            color: white;
         }
 
-        @media print {
-            body { background: white; color: black; padding: 0; }
-            .audit-box { box-shadow: none; padding: 0; }
-            .summary-section { max-height: none; }
-            .btn, .enter-btn, .input-row, .subtitle, #historySection { display: none !important; }
-            #historyList { max-height: none !important; }
+        .delete-btn { 
+            background: #ecf0f1; 
+            color: var(--danger); 
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            font-size: 14px;
+        }
+
+        .summary-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .summary-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .summary-table tr:hover {
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        .summary-table .total-qty {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--success);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--dark);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            font-weight: 600;
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
         }
 
         @media (max-width: 768px) {
-            .history-table {
-                font-size: 0.8rem;
+            body { padding: 10px; }
+            .form-grid { 
+                grid-template-columns: 1fr; 
+                gap: 15px;
             }
-            .history-table th,
-            .history-table td {
-                padding: 8px 4px;
+            .logs-header { 
+                flex-direction: column; 
+                align-items: stretch; 
+            }
+            .controls-wrapper { 
+                align-items: stretch; 
+            }
+            .filter-group input {
+                width: 100%;
+            }
+            .global-actions {
+                justify-content: center;
+            }
+            .summary-table { font-size: 13px; }
+            .summary-table th, .summary-table td { 
+                padding: 12px 10px; 
+            }
+            .log-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
             }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Hold Sticker Logs</h1>
+        </div>
 
-<div class="container">
-    <div class="audit-box">
-        <h1>Sticker Audit Log</h1>
-        <div class="subtitle">Enter counts, press Enter or click Add to log.</div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="logs">📋 Hold Logs</button>
+            <button class="tab-btn" data-tab="summary">📊 Inventory Summary</button>
+        </div>
 
-        <div id="historySection">
-            <div class="history-header">
-                <div class="history-title">📋 ALL RECORDS FROM GOOGLE SHEETS</div>
-                <div class="history-controls">
-                    <button class="btn btn-primary" onclick="fetchHistory()">🔄 Refresh</button>
-                    <button class="btn btn-success" onclick="exportAll()">📄 Export CSV</button>
+        <!-- AUDIT LOGS TAB -->
+        <div id="logsTab" class="tab-content active">
+            <div class="add-section">
+                <form id="auditForm" class="form-grid">
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input type="text" id="itemName" placeholder="e.g., MINI FLASHLIGHT" autocomplete="off">
+                        <div class="dropdown-container" id="dropdownContainer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" min="1" placeholder="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn add-btn" id="submitBtn">➕ Add Log</button>
+                       <button type="button" class="btn cancel-btn" id="cancelBtn" onclick="cancelEdit()">✖ Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="logs-section">
+                <div class="logs-header">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div id="totalItems">0</div>
+                            <small>Total Logs</small>
+                        </div>
+                        <div class="stat-card">
+                            <div id="totalQuantity">0</div>
+                            <small>Total Quantity</small>
+                        </div>
+                    </div>
+                    
+                    <div class="controls-wrapper">
+                        <div class="filter-group">
+                            <input type="text" id="searchInput" placeholder="🔍 Search items by name...">
+                        </div>
+                        <div class="global-actions">
+                            <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
+<button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
+                            <button class="btn global-btn btn-clear-all" onclick="clearAllLogs()">🗑️ Clear All</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="logs" id="logsContainer">
+                    <div class="empty-state">
+                        <h3>🚀 Get Started</h3>
+                        <p>Add your first inventory audit log using the form above!</p>
+                    </div>
                 </div>
             </div>
-            <div class="record-count" id="recordCount" style="display: none;"></div>
-            <div id="historyList">
-                <div class="loading">Click refresh to load ALL records from Google Sheets...</div>
-            </div>
         </div>
 
-        <div id="products-container"></div>
-
-        <div class="grand-total" id="grandTotal">
-            GRAND TOTAL: 0 STICKERS
-        </div>
-
-        <div class="summary-section" id="summarySection" style="display: none;">
-            <div class="summary-title">📊 Live Summary (Unsaved)</div>
-            <div id="summaryList"></div>
-        </div>
-
-        <div class="action-buttons">
-            <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
-            <button class="btn btn-primary" onclick="toggleSummary()">📋 Toggle Summary</button>
-            <button class="btn btn-primary" onclick="copySummary()">📄 Copy Summary</button>
-            <button class="btn btn-success" id="saveBtn" onclick="saveToGoogleSheets()" style="background: #10b981; color: white; border-color: #10b981;">☁️ Save to Sheets</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const productList = [
-        "1 x SEAT COVER", "1 x MINI FLASHLIGHT", "1 x FULL FACE BALACLAVA",
-        "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x SHOE CLEANER", "2 x FLASHLIGHT",
-        "2 x MINI FLASHLIGHT", "1 x PANTY STOCKINGS", "1 x MAGIC MESH", "2 x ANTI - PULGAS", "1 x MAGIC TOWEL"
-    ];
-
-    let summaryData = {}; 
-    let summaryVisible = false;
-    const today = new Date().toISOString().split('T')[0];
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzMM60idR6QEYvznvh2ogYXDxSJ9552beS6rLFMNdhqRtqDh0zuOq4TwrHCJ8u5uKCFOA/exec";
-
-    // Build Inputs
-    const container = document.getElementById('products-container');
-    productList.forEach((product, index) => {
-        const id = index + 1;
-        container.innerHTML += `
-            <div class="product-section" id="productSection${id}">
-                <div class="product-line">${product}</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Date</label>
-                        <input type="date" id="date${id}" value="${today}">
+        <!-- INVENTORY SUMMARY TAB -->
+        <div id="summaryTab" class="tab-content">
+            <div class="summary-section">
+                <div class="logs-header">
+                    <div class="stats">
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);">
+                            <div id="uniqueItems">0</div>
+                            <small>Unique Items                        </small>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--warning) 0%, #f39c12 100%);">
+                            <div id="summaryTotalQty">0</div>
+                            <small>Total Stock</small>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>Count</label>
-                        <input type="number" id="count${id}" placeholder="0" min="1" 
-                               onkeydown="if(event.key==='Enter') enterItem(${id})">
+                    <div class="controls-wrapper">
+                        <button class="btn global-btn" onclick="refreshSummary()" style="background: var(--dark);">🔄 Refresh</button>
                     </div>
-                    <button class="enter-btn" onclick="enterItem(${id})">Add</button>
                 </div>
-                <div class="status" id="status${id}"></div>
-            </div>
-        `;
-    });
-
-    // --- FETCH HISTORY - SHOWS ALL RECORDS ---
-    function fetchHistory() {
-        const historyList = document.getElementById('historyList');
-        const recordCount = document.getElementById('recordCount');
-        
-        historyList.innerHTML = '<div class="loading">⌛ Loading ALL records from Google Sheets...</div>';
-        recordCount.style.display = 'none';
-
-        const fetchUrl = WEB_APP_URL + "?action=read&t=" + new Date().getTime();
-
-        fetch(fetchUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === "success") {
-                if (!data.records || data.records.length === 0) {
-                    historyList.innerHTML = '<div class="loading">No records found in Google Sheets.</div>';
-                    return;
-                }
-
-                // SHOW ALL RECORDS - NO LIMIT!
-                let html = `
-                    <table class="history-table">
+                
+                <div class="summary-table-container">
+                    <table class="summary-table" id="summaryTable">
                         <thead>
                             <tr>
-                                <th style="width: 20%;">Date</th>
-                                <th style="width: 50%;">Product</th>
-                                <th style="width: 20%;">Count</th>
-                                <th style="width: 10%;">ID</th>
+                                <th>Item Name</th>
+                                <th>Total Quantity</th>
+                                <th>Log Count</th>
+                                <th>Last Updated</th>
                             </tr>
                         </thead>
-                        <tbody>
-                `;
-                
-                data.records.forEach((rec, index) => {
-                    let dateStr = rec.date ? rec.date.split('T')[0] : 'N/A';
-                    let productName = rec.product || 'N/A';
-                    let count = rec.count || 0;
-                    let rowId = rec.rowId || index + 1;
-                    
-                    html += `
-                        <tr>
-                            <td style="font-weight: 500; color: var(--text-main);">${dateStr}</td>
-                            <td style="font-weight: 600; color: #0f172a;">${productName}</td>
-                            <td style="text-align: right; font-weight: 700; color: var(--success-dark);">${count}</td>
-                            <td style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">${rowId}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += `
+                        <tbody id="summaryTableBody">
+                            <tr>
+                                <td colspan="4" class="empty-state" style="padding: 60px; text-align: center;">
+                                    <h3>No inventory summary yet</h3>
+                                    <p>Add some audit logs to see the summary here!</p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
-                `;
-                
-                historyList.innerHTML = html;
-                
-                // Show record count
-                recordCount.textContent = `Total Records: ${data.records.length}`;
-                recordCount.style.display = 'inline-block';
-                
-            } else {
-                throw new Error(data.message || 'Unknown error');
-            }
-        })
-        .catch(err => {
-            console.error("Fetch Error:", err);
-            historyList.innerHTML = `<div class="error">⚠️ Failed to load records: ${err.message}</div>`;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let auditLogs = [];
+        let inventorySummary = [];
+        let editingLogId = null;
+        let currentTab = 'logs';
+        let dropdownTimeout;
+        let selectedIndex = -1;
+
+        const initialItems = [
+            "MINI FLASHLIGHT", "FLASHLIGHT", "SEAT COVER", "MOTORCYCLE GLOVES",
+            "CAMERA SHUTTER REMOTE", "FULLFACE BLACKLAVA", "MOLDABLE FALSE TEETH",
+            "HANDS FREE FEEDING BOTTLE", "MINI USB FAN", "MAGIC MESH",
+            "HELMET CARGO NET", "PANTY STOCKINGS", "WAIST BAND SHAPER",
+            "SHOE CLEANER", "FLEXIBLE CLIP PHONE HOLDER", "ANTI PULGAS",
+            "RUBBER COATING SPRAY", "NOSE SHAPER", "MOTORCYCLE BOLT CUP"
+        ];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            setDateToday();
+            initEventListeners();
+            loadData();
         });
-    }
 
-    // Export all records as CSV
-    function exportAll() {
-        fetch(WEB_APP_URL + "?action=read")
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "success" && data.records) {
-                let csv = 'Date,Product,Count\n';
-                data.records.forEach(rec => {
-                let dateStr = rec.date ? rec.date.split('T')[0] : '';
-                csv += `"${dateStr}","${rec.product || ''}",${rec.count || 0}\n`;
-                });
-                
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `sticker-audit-${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-            }
-        })
-        .catch(() => alert('Failed to export.'));
-    }
-
-    function enterItem(id) {
-        const dateInput = document.getElementById(`date${id}`).value;
-        const countInput = document.getElementById(`count${id}`).value;
-        const count = parseInt(countInput) || 0;
-        const productName = productList[id - 1];
-        const statusEl = document.getElementById(`status${id}`);
-
-        if (!dateInput || count <= 0) return;
-
-        if (!summaryData[`item${id}`]) { summaryData[`item${id}`] = []; }
-        summaryData[`item${id}`].push({ product: productName, date: dateInput, count: count });
-
-        const productTotal = summaryData[`item${id}`].reduce((sum, entry) => sum + entry.count, 0);
-        statusEl.innerHTML = `<span>✅ Added ${count}</span> <span>| Total: ${productTotal}</span>`;
-        statusEl.style.display = 'flex';
-        statusEl.className = 'status sent';
-
-        document.getElementById(`count${id}`).value = '';
-        calculateGrandTotal();
-        updateSummary();
-        showSummary(); 
-    }
-
-    function saveToGoogleSheets() {
-        if (Object.keys(summaryData).length === 0) {
-            alert("⚠️ No data to save!");
-            return;
+        function setDateToday() {
+            const today = new Date();
+            document.getElementById('date').valueAsDate = today;
         }
 
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = "⏳ Saving...";
-        saveBtn.disabled = true;
+        function initEventListeners() {
+            // Form submission
+            document.getElementById('auditForm').addEventListener('submit', handleFormSubmit);
+            
+            // Search input
+            document.getElementById('searchInput').addEventListener('input', function() {
+                renderLogs(this.value);
+            });
 
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            redirect: "follow",
-            body: JSON.stringify(summaryData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "success") {
-                alert("✅ Successfully saved to Google Sheets!");
-                clearAll();
-                fetchHistory(); // Refresh to show new records
-            } else {
-                alert("❌ Error: " + (data.error || "Unknown error"));
-            }
-        })
-        .catch(error => {
-            alert("❌ Failed to reach the server.");
-        })
-        .finally(() => {
-            saveBtn.innerText = "☁️ Save to Sheets";
-            saveBtn.disabled = false;
+            // Item name input events
+            const itemNameInput = document.getElementById('itemName');
+            itemNameInput.addEventListener('input', handleItemNameInput);
+            itemNameInput.addEventListener('keydown', handleItemNameKeydown);
+
+            // Global click to close dropdown
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.form-group:has(#itemName)')) {
+                    closeDropdown();
+                }
+            });
+        }
+
+        // Google Sheets API calls
+async function callGoogleScript(functionName, parameters = {}) {
+    try {
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxzfTL8pwui1zx8NeWXyc8CDHpCyuaP5UPx0GOc50kfG1N5cdBavwMgM6BmYm9r6AxU/exec';
+        
+        const container = document.querySelector('.container');
+        container.classList.add('loading');
+        
+        // ✅ CORS-SAFE headers for Google Apps Script
+        // ✅ Fixed fetch request for Google Apps Script
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'cors',  
+            redirect: 'follow', // REQUIRED for Google Apps Script
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8', // REQUIRED to prevent CORS preflight error
+            },
+            body: JSON.stringify({ 
+                functionName, 
+                parameters 
+            })
         });
-    }
 
-    // --- ADDITIONAL FUNCTIONS ---
-    function calculateGrandTotal() {
-        let totalCount = 0;
-        Object.values(summaryData).forEach(entries => {
-            entries.forEach(entry => {
-                totalCount += entry.count;
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success !== false) {
+            return result.data || result;
+        } else {
+            throw new Error(result.error || result.message || 'Unknown error');
+        }
+    } catch (error) {
+        console.error('Google Script Error:', error);
+        showToast('❌ Connection failed: ' + error.message);
+        return { success: false, message: error.message };
+    } finally {
+        document.querySelector('.container').classList.remove('loading');
+    }
+}
+        async function loadData() {
+            showToast('🔄 Loading data...');
+            
+            try {
+                // Load audit logs
+                const logsResult = await callGoogleScript('getAllLogs');
+                if (logsResult.success !== false) {
+                    auditLogs = Array.isArray(logsResult) ? logsResult : [];
+                    renderLogs();
+                    updateStats();
+                }
+
+                // Load inventory summary
+                const summaryResult = await callGoogleScript('getInventorySummary');
+                if (summaryResult.success !== false) {
+                    inventorySummary = Array.isArray(summaryResult) ? summaryResult : [];
+                    renderSummary();
+                    updateSummaryStats();
+                }
+                
+                showToast('✅ Data loaded successfully!');
+            } catch (error) {
+                console.error('Load data error:', error);
+            }
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                switchTab(tab);
             });
         });
-        document.getElementById('grandTotal').innerText = `GRAND TOTAL: ${totalCount} STICKERS`;
-    }
 
-    function updateSummary() {
-        const summaryList = document.getElementById('summaryList');
-        summaryList.innerHTML = '';
-        for (const key in summaryData) {
-            if (summaryData[key].length > 0) {
-                const productName = summaryData[key][0].product;
-                const div = document.createElement('div');
-                div.className = 'summary-product';
-                let productTotal = 0;
-                let itemsHtml = '';
-                
-                summaryData[key].forEach((entry, index) => {
-                    productTotal += entry.count;
-                    itemsHtml += `
-                        <div class="summary-item">
-                            <span>${entry.date} - Count: ${entry.count}</span>
-                            <button style="border:none; background:none; color:var(--danger); cursor:pointer; font-size:1rem;" onclick="deleteEntry('${key}', ${index})" title="Delete">🗑️</button>
-                        </div>
-                    `;
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            if (tab === 'summary') {
+                refreshSummary();
+            }
+        }
+
+        // Form handling
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const itemName = document.getElementById('itemName').value.trim();
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const date = document.getElementById('date').value;
+
+            if (!itemName || !quantity || !date) {
+                showToast('⚠️ Please fill all fields');
+                return;
+            }
+
+            if (quantity < 1) {
+                showToast('⚠️ Quantity must be at least 1');
+                return;
+            }
+
+            const logData = { itemName, quantity, date };
+            if (editingLogId) logData.id = editingLogId;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Saving...';
+
+            const result = await callGoogleScript(editingLogId ? 'updateLog' : 'addLog', logData);
+            
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            
+            if (result.success) {
+                showToast(result.message || (editingLogId ? '✅ Log updated!' : '✅ Log added!'));
+                resetForm();
+                await loadData();
+            } else {
+                showToast('✅ ' + (result.message || 'Operation failed'));
+            }
+        }
+
+        function resetForm() {
+            editingLogId = null;
+            document.getElementById('itemName').value = '';
+            document.getElementById('quantity').value = '';
+            setDateToday();
+            document.getElementById('submitBtn').innerHTML = '➕ Add Log';
+            document.getElementById('cancelBtn').classList.remove('visible');
+            closeDropdown();
+        }
+
+        function cancelEdit() {
+    resetForm();
+    editingLogId = null;
+
+    // Scroll back to top (optional but nice)
+    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+
+    showToast('↩️ Back to Add Mode');
+}
+
+        // Dropdown management
+        function handleItemNameInput(e) {
+            manageDropdown(e.target.value);
+        }
+
+        function handleItemNameKeydown(e) {
+            const dropdownContainer = document.getElementById('dropdownContainer');
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            
+            if (!dropdownContainer.classList.contains('show') || dropdownItems.length === 0) return;
+
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, dropdownItems.length - 1);
+                    updateDropdownSelection(dropdownItems);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, 0);
+                    updateDropdownSelection(dropdownItems);
+                    break;
+                case 'Enter':
+                    if (selectedIndex >= 0) {
+                        e.preventDefault();
+                        selectDropdownItem(dropdownItems[selectedIndex].dataset.item);
+                    }
+                    break;
+                case 'Escape':
+                    closeDropdown();
+                    break;
+            }
+        }
+
+        function manageDropdown(inputValue) {
+            const dropdownContainer = document.getElementById('dropdownContainer');
+            clearTimeout(dropdownTimeout);
+            
+            if (!inputValue || inputValue.length < 1) {
+                closeDropdown();
+                return;
+            }
+
+            const filteredItems = initialItems
+                .filter(item => item.toLowerCase().includes(inputValue.toLowerCase()))
+                .sort((a, b) => {
+                    const aStartsWith = a.toLowerCase().startsWith(inputValue.toLowerCase());
+                    const bStartsWith = b.toLowerCase().startsWith(inputValue.toLowerCase());
+                    return (aStartsWith === bStartsWith ? 0 : aStartsWith ? -1 : 1) || a.localeCompare(b);
                 });
-                
-                div.innerHTML = `
-                    <div class="product-header">
-                        <span>${productName}</span>
-                        <span>Total: ${productTotal}</span>
+
+            if (filteredItems.length === 0) {
+                closeDropdown();
+                return;
+            }
+
+            renderDropdown(filteredItems);
+            dropdownTimeout = setTimeout(() => {
+                dropdownContainer.classList.add('show');
+                selectedIndex = -1;
+            }, 50);
+        }
+
+        function renderDropdown(items) {
+            const container = document.getElementById('dropdownContainer');
+            container.innerHTML = items.map((item, index) => `
+                <div class="dropdown-item" data-item="${item}" data-index="${index}">${item}</div>
+            `).join('');
+
+            document.querySelectorAll('.dropdown-item').forEach((itemEl, index) => {
+                itemEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    selectDropdownItem(this.dataset.item);
+                });
+                itemEl.addEventListener('mouseenter', function() {
+                    selectedIndex = parseInt(this.dataset.index);
+                    updateDropdownSelection(document.querySelectorAll('.dropdown-item'));
+                });
+            });
+        }
+
+        function selectDropdownItem(itemName) {
+            document.getElementById('itemName').value = itemName;
+            closeDropdown();
+            showToast('✨ Item selected!');
+        }
+
+        function updateDropdownSelection(items) {
+            items.forEach((item, index) => {
+                item.classList.toggle('selected', index === selectedIndex);
+            });
+            if (selectedIndex >= 0) {
+                items[selectedIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function closeDropdown() {
+            document.getElementById('dropdownContainer').classList.remove('show');
+            selectedIndex = -1;
+        }
+
+        // Render logs
+        function renderLogs(filter = '') {
+            const container = document.getElementById('logsContainer');
+            const filteredLogs = auditLogs.filter(log => 
+                log.itemName.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filteredLogs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>${auditLogs.length === 0 ? '🚀 Get Started' : 'No logs found'}</h3>
+                        <p>${auditLogs.length === 0 ? 'Add your first inventory log above!' : 'Try adjusting your search.'}</p>
                     </div>
-                    ${itemsHtml}
-                    <div class="product-total">Product Total: ${productTotal}</div>
                 `;
-                summaryList.appendChild(div);
+                return;
+            }
+
+            container.innerHTML = filteredLogs.map(log => `
+                <div class="log-item" data-log-id="${log.id}">
+                    <div class="log-header">
+                        <div class="item-name">${escapeHtml(log.itemName)}</div>
+                        <div class="quantity">Qty: ${log.quantity.toLocaleString()}</div>
+                    </div>
+                    <div class="log-meta">
+                        <span class="log-id">#${log.id.toString().padStart(4, '0')}</span>
+                        <span>📅 ${formatDate(log.date)}</span>
+                        <span>⏱️ ${formatTime(log.timestamp)}</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="editLog(${log.id})">✏️ Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteLog(${log.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Log actions
+        async function editLog(logId) {
+            const log = auditLogs.find(l => l.id == logId);
+            if (!log) return showToast('⚠️ Log not found');
+
+            editingLogId = logId;
+            document.getElementById('itemName').value = log.itemName;
+            document.getElementById('quantity').value = log.quantity;
+            document.getElementById('date').value = log.date;
+            
+            document.getElementById('submitBtn').innerHTML = '💾 Update Log';
+            document.getElementById('cancelBtn').classList.add('visible');
+            
+            document.querySelector('.add-section').scrollIntoView({ behavior: 'smooth' });
+            showToast('✏️ Edit mode activated');
+            manageDropdown(log.itemName); // Show dropdown with current item
+        }
+
+        async function deleteLog(logId) {
+            if (!confirm(`Delete log #${logId.toString().padStart(4, '0')}?`)) return;
+            
+            const result = await callGoogleScript('deleteLog', { logId });
+            if (result.success) {
+                showToast('🗑️ Log deleted!');
+                await loadData();
+            } else {
+                showToast('✅ ' + (result.message || 'Delete failed'));
             }
         }
-    }
 
-    function showSummary() {
-        document.getElementById('summarySection').style.display = 'block';
-    }
+        // Summary rendering
+        function renderSummary() {
+            const tbody = document.getElementById('summaryTableBody');
+            if (inventorySummary.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state" style="padding: 60px; text-align: center;">
+                            <h3>No inventory summary yet</h3>
+                            <p>Add some audit logs to see the summary here!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
-    function toggleSummary() {
-        const section = document.getElementById('summarySection');
-        section.style.display = section.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function clearAll() {
-        summaryData = {};
-        updateSummary();
-        calculateGrandTotal();
-        document.querySelectorAll('.status').forEach(el => {
-            el.style.display = 'none';
-            el.innerHTML = '';
-        });
-        document.getElementById('summarySection').style.display = 'none';
-    }
-
-    function copySummary() {
-        const summaryText = Object.values(summaryData).flat().map(entry => 
-            `${entry.product} (${entry.date}): ${entry.count}`
-        ).join('\n');
-
-        navigator.clipboard.writeText(summaryText)
-            .then(() => alert('✅ Summary copied to clipboard!'))
-            .catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = summaryText;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('✅ Summary copied to clipboard!');
-            });
-    }
-
-    function deleteEntry(key, index) {
-        if (summaryData[key] && summaryData[key][index]) {
-            summaryData[key].splice(index, 1);
-            if (summaryData[key].length === 0) delete summaryData[key];
-            updateSummary();
-            calculateGrandTotal();
+            tbody.innerHTML = inventorySummary.map(item => `
+                <tr>
+                    <td style="font-weight: 600; color: var(--dark);">${escapeHtml(item.itemName)}</td>
+                    <td class="total-qty">${item.totalQuantity.toLocaleString()}</td>
+                    <td>${item.logCount}</td>
+                    <td>${formatDate(item.lastUpdated)}</td>
+                </tr>
+            `).join('');
         }
-    }
 
-    // Initialize on load
-    window.onload = function() {
-        fetchHistory();
-    };
-</script>
+        // Stats updates
+        function updateStats() {
+            const totalItems = auditLogs.length;
+            const totalQuantity = auditLogs.reduce((sum, log) => sum + (log.quantity || 0), 0);
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalQuantity').textContent = totalQuantity.toLocaleString();
+        }
+
+        function updateSummaryStats() {
+            const uniqueItems = inventorySummary.length;
+            const totalStock = inventorySummary.reduce((sum, item) => sum + (item.totalQuantity || 0), 0);
+            document.getElementById('uniqueItems').textContent = uniqueItems;
+            document.getElementById('summaryTotalQty').textContent = totalStock.toLocaleString();
+        }
+
+        // Global actions
+        async function copyAllLogs() {
+            if (auditLogs.length === 0) return showToast('⚠️ No logs to copy!');
+            
+            let text = `INVENTORY AUDIT - ${new Date().toLocaleDateString()}\n`;
+            text += `----------------------------------------\n`;
+            auditLogs.forEach(log => {
+                text += `[${formatDate(log.date)} ${formatTime(log.timestamp)}] ${log.quantity}x ${log.itemName}\n`;
+            });
+            text += `----------------------------------------\n`;
+            text += `Total Logs: ${auditLogs.length} | Total Qty: ${auditLogs.reduce((sum, log) => sum + log.quantity, 0).toLocaleString()}`;
+
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(`📋 Copied ${auditLogs.length} logs!`);
+            } catch {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('📋 Copied to clipboard!');
+        }
+
+        async function exportCSV() {
+            if (auditLogs.length === 0) return showToast('⚠️ No logs to export!');
+            
+            let csv = "Log ID,Item Name,Quantity,Date,Timestamp\n";
+            auditLogs.forEach(log => {
+                csv += `"${log.id}","${escapeCsv(log.itemName)}",${log.quantity},"${log.date}","${log.timestamp}"\n`;
+            });
+
+            downloadCSV(csv, `inventory_audit_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        async function exportSummaryCSV() {
+            if (inventorySummary.length === 0) return showToast('⚠️ No summary to export!');
+            
+            let csv = "Item Name,Total Quantity,Log Count,Last Updated\n";
+            inventorySummary.forEach(item => {
+                csv += `"${escapeCsv(item.itemName)}",${item.totalQuantity},${item.logCount},"${item.lastUpdated}"\n`;
+            });
+
+            downloadCSV(csv, `inventory_summary_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function clearAllLogs() {
+            if (auditLogs.length === 0) return showToast('⚠️ No logs to clear!');
+            if (!confirm('⚠️ Delete ALL logs? This cannot be undone!')) return;
+            
+            const result = await callGoogleScript('clearAllLogs');
+            if (result.success) {
+                showToast('🗑️ All logs cleared!');
+                              auditLogs = [];
+                inventorySummary = [];
+                renderLogs();
+                renderSummary();
+                updateStats();
+                updateSummaryStats();
+            } else {
+                showToast('❌ ' + (result.message || 'Clear failed'));
+            }
+        }
+
+        async function refreshSummary() {
+            showToast('🔄 Refreshing summary...');
+            const result = await callGoogleScript('getInventorySummary');
+            if (result.success !== false) {
+                inventorySummary = Array.isArray(result) ? result : [];
+                renderSummary();
+                updateSummaryStats();
+                showToast('✅ Summary refreshed!');
+            }
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function escapeCsv(text) {
+            return text.replace(/"/g, '""');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                return new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', { 
+                    year: 'numeric', month: 'short', day: 'numeric' 
+                });
+            } catch {
+                return 'Invalid Date';
+            }
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            try {
+                return new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } catch {
+                return 'N/A';
+            }
+        }
+
+        // Toast notifications
+        let toastTimeout;
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Auto-save reminder (only if data exists)
+        setInterval(() => {
+            if (auditLogs.length > 0) {
+                // Reduced frequency and non-intrusive
+            }
+        }, 30 * 60 * 1000); // Every 30 minutes
+
+        // PWA-like offline warning
+        window.addEventListener('online', () => {
+            if (navigator.onLine) {
+                loadData();
+                showToast('🌐 Back online!');
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('⚠️ Offline - Data will sync when back online');
+        });
+
+        // Error boundary for unhandled errors
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            showToast('⚠️ An error occurred. Check console for details.');
+        });
+    </script>
 </body>
 </html>
