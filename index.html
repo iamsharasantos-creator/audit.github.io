@@ -237,8 +237,11 @@
         }
 
         .logs-section, .summary-section {
-            padding: 30px;
-        }
+           display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px;
+}
 
         .logs-header {
             display: flex;
@@ -309,11 +312,14 @@
         .btn-export { background: var(--success); }
         .btn-clear-all { background: var(--danger); }
 
-        .logs, .summary-table-container {
-            max-height: 600px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
+        .logs, ..summary-table-container {
+    width: 100%;
+    max-width: 1000px; /* Optional: adjust based on preference */
+    margin: 0 auto;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    overflow: hidden;
+}
 
         .logs::-webkit-scrollbar,
         .summary-table-container::-webkit-scrollbar {
@@ -412,29 +418,40 @@
         }
 
         .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            font-size: 14px;
-        }
+   width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 14px;
+}
 
         .summary-table th {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 18px 20px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 15px;
-        }
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 700;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
         .summary-table td {
-            padding: 18px 20px;
-            border-bottom: 1px solid #f0f2f5;
-        }
+    padding: 8px 15px;
+    border-bottom: 1px solid #f0f2f5;
+    line-height: 1.4;
+}
+.item-group-header td {
+    background-color: #f8f9ff !important;
+    font-size: 13px;
+    border-top: 2px solid #eee;
+}
 
+.item-group-total td {
+    background-color: #fff;
+    padding-bottom: 15px !important;
+}
         .summary-table tr:hover {
             background: rgba(79, 172, 254, 0.05);
         }
@@ -545,6 +562,7 @@
 
         <div class="tabs">
             <button class="tab-btn active" data-tab="logs">📋 Hold Logs</button>
+            <button class="tab-btn" data-tab="blankStock">⚪ Blank Sticker Stock</button>
             <button class="tab-btn" data-tab="summary">📊 Inventory Summary</button>
         </div>
 
@@ -582,6 +600,7 @@
                             <div id="totalQuantity">0</div>
                             <small>Total Quantity</small>
                         </div>
+                        
                     </div>
                     
                     <div class="controls-wrapper">
@@ -591,7 +610,6 @@
                         <div class="global-actions">
                             <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
                             <button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
-                            <button class="btn global-btn btn-clear-all" onclick="clearAllLogs()">🗑️ Clear All</button>
                         </div>
                     </div>
                 </div>
@@ -605,65 +623,96 @@
             </div>
         </div>
 
-        <div id="summaryTab" class="tab-content">
-            <div class="summary-section">
-                
-                <div class="blank-sticker-card">
-                    <h3 style="margin-bottom: 15px; color: var(--dark); display: flex; align-items: center; gap: 10px;">
-                        ⚪ Blank Sticker Stock
-                    </h3>
-                    <div class="blank-sticker-grid">
-                        <div class="stat-card" style="background: var(--dark); flex: 1; min-width: 200px;">
-                            <div id="totalBlankStickers">0</div>
-                            <small>Total Blank Stickers</small>
-                        </div>
-                        <div class="blank-btn-group">
-                            <button class="btn add-btn" onclick="modifyBlankStickers(200)" style="flex: 1; background: var(--primary);">➕ Add 200</button>
-                            <button class="btn add-btn" onclick="modifyBlankStickers(1000)" style="flex: 1; background: var(--success);">➕ Add 1,000</button>
-                            <button class="btn delete-btn" onclick="resetBlankStickers()" style="padding: 0 15px; border-radius: 12px; font-weight: 600;">Reset</button>
-                        </div>
-                    </div>
-                </div>
+<div id="summaryTab" class="tab-content">
+    <div class="summary-section">
+    <div class="stats" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
+        <div class="stat-card" style="background: var(--dark); flex: 1; min-width: 250px;">
+            <div id="totalBlankStickers">0</div>
+            <small>Sticker With Number Stocks</small>
+        </div>
+        <div class="stat-card" style="background: var(--primary); flex: 1; min-width: 250px;">
+            <div id="totalBlankNoNums">0</div>
+            <small>Stock Without Numbers</small>
+        </div>
+        <div class="stat-card" style="background: #f39c12; flex: 1; min-width: 250px;">
+            <div id="summaryTotalQty">0</div>
+            <small>Total Hold Quantity</small>
+        </div>
+    </div>
 
-                <div class="logs-header">
-                    <div class="stats">
-                        <div class="stat-card" style="background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);">
-                            <div id="uniqueItems">0</div>
-                            <small>Unique Items</small>
-                        </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, var(--warning) 0%, #f39c12 100%);">
-                            <div id="summaryTotalQty">0</div>
-                            <small>Total Stock</small>
-                        </div>
-                    </div>
-                    <div class="controls-wrapper">
-                        <button class="btn global-btn" onclick="refreshSummary()" style="background: var(--dark);">🔄 Refresh</button>
-                    </div>
+    <h3 style="margin-bottom: 15px; color: var(--dark);">📦 Stock Breakdown</h3>
+    <div class="summary-table-container" style="margin-bottom: 40px;">
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Sticker Type / Category</th>
+                    <th style="text-align: right;">Current Count</th>
+                </tr>
+            </thead>
+            <tbody id="stockBreakdownBody">
+                </tbody>
+        </table>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: var(--dark);">📋 Item Logs Summary</h3>
+    <div class="summary-table-container">
+        <table class="summary-table" id="summaryTable">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th style="text-align: right;">Total Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+    </div>
+<div id="blankStockTab" class="tab-content">
+    <div class="summary-section" style="background: white; margin: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 40px;">
+        
+        <h2 style="margin-bottom: 25px; color: var(--dark); border-bottom: 2px solid var(--light-bg); padding-bottom: 15px;">
+            📦 Stock Management
+        </h2>
+
+        <div class="blank-sticker-card">
+            <h3 style="margin-bottom: 15px; color: var(--dark); display: flex; align-items: center; gap: 10px;">
+                ⚪ Blank Stickers (With Numbers)
+            </h3>
+            <div class="blank-sticker-grid">
+                <div class="stat-card" style="background: var(--dark); flex: 1; min-width: 200px;">
+                    <div id="totalBlankStickers">0</div>
+                    <small>Stock With Numbers</small>
                 </div>
-                
-                <div class="summary-table-container">
-                    <table class="summary-table" id="summaryTable">
-                        <thead>
-                            <tr>
-                                <th>Item Name</th>
-                                <th>Total Quantity</th>
-                                <th>Log Count</th>
-                                <th>Last Updated</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summaryTableBody">
-                            <tr>
-                                <td colspan="4" class="empty-state" style="padding: 60px; text-align: center;">
-                                    <h3>No inventory summary yet</h3>
-                                    <p>Add some audit logs to see the summary here!</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="blank-btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button class="btn add-btn" onclick="modifyBlankStickers(180, 'with')" style="background: var(--success);">+180</button>
+                    <button class="btn add-btn" onclick="modifyBlankStickers(200, 'with')" style="background: var(--primary);">+200</button>
+                    <span style="margin: 0 10px; color: var(--gray);">|</span>
+                    <input type="number" id="manualBlankWith" placeholder="Qty" style="width: 80px; padding: 10px; border-radius: 12px; border: 2px solid var(--danger);">
+                    <button class="btn add-btn" onclick="handleDeduction('with')" style="background: var(--danger);">➖ Deduct</button>
                 </div>
             </div>
         </div>
+
+        <div class="blank-sticker-card" style="border-color: var(--primary);">
+            <h3 style="margin-bottom: 15px; color: var(--dark); display: flex; align-items: center; gap: 10px;">
+                🔘 Blank Stickers (Without Numbers)
+            </h3>
+            <div class="blank-sticker-grid">
+                <div class="stat-card" style="background: var(--primary); flex: 1; min-width: 200px;">
+                    <div id="totalBlankNoNums">0</div>
+                    <small>Stock Without Numbers</small>
+                </div>
+                <div class="blank-btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button class="btn add-btn" onclick="modifyBlankStickers(1000, 'without')" style="background: var(--success);">+1000</button>
+                    <button class="btn add-btn" onclick="modifyBlankStickers(12000, 'without')" style="background: var(--dark);">+12000 (Box)</button>
+                </div>
+            </div>
+        </div>
+
     </div>
+</div>
 
     <div id="toast" class="toast"></div>
 
@@ -671,18 +720,19 @@
         let auditLogs = [];
         let inventorySummary = [];
         let blankStickersCount = 0; // New state variable
+        let blankStickersNoNumsCount = 0;
         let editingLogId = null;
         let currentTab = 'logs';
         let dropdownTimeout;
         let selectedIndex = -1;
 
         const initialItems = [
-            "MINI FLASHLIGHT", "FLASHLIGHT", "SEAT COVER", "MOTORCYCLE GLOVES",
-            "CAMERA SHUTTER REMOTE", "FULLFACE BLACKLAVA", "MOLDABLE FALSE TEETH",
-            "HANDS FREE FEEDING BOTTLE", "MINI USB FAN", "MAGIC MESH",
-            "HELMET CARGO NET", "PANTY STOCKINGS", "WAIST BAND SHAPER",
-            "SHOE CLEANER", "FLEXIBLE CLIP PHONE HOLDER", "ANTI PULGAS",
-            "RUBBER COATING SPRAY", "NOSE SHAPER", "MOTORCYCLE BOLT CUP"
+            "1 x MINI FLASHLIGHT","2 x MINI FLASHLIGHT", "2 x FLASHLIGHT", "1 x SEAT COVER", "1 x MOTORCYCLE GLOVES",
+            "1 x CAMERA SHUTTER REMOTE", "1 x FULLFACE BLACKLAVA", "1 x MOLDABLE FALSE TEETH",
+            "1 x HANDS FREE FEEDING BOTTLE", "1 x MINI USB FAN", "1 x MAGIC MESH",
+            "1 x HELMET CARGO NET", "1 x PANTY STOCKINGS", "1 x WAIST BAND SHAPER",
+            "2 x SHOE CLEANER", "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x ANTI PULGAS","1 x WAISTBAND SHAPER",
+            "1 x RUBBER COATING SPRAY", "1 x NOSE SHAPER", "1 x MOTORCYCLE BOLT CUP","1 x FACE SHAPER","1 x LASER FLASHLIGHT","2 x MAGIC TOWEL","1 x CUP CLEANER","1 x GAS TREATMENT","1 x HELMET HOOK","1 x MULTI PURPOSE SAFETY LOCK"
         ];
 
         // Initialize app
@@ -715,7 +765,7 @@
         // Google Sheets API calls
         async function callGoogleScript(functionName, parameters = {}) {
             try {
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbzO7LDAqbGMmgTq9gP36vNQGL9rQuygjyF5c2Zq0IsBtffcuQBnTuMFA6cDbfsxFk1u/exec';
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbymKAcS0I7nYrrh6Nnr_uWDyylhIWhU-BiqIgiLXCOmCl5ejAwaHECt_HhFAcoJ_CjHoA/exec';
                 const container = document.querySelector('.container');
                 container.classList.add('loading');
                 
@@ -741,112 +791,184 @@
             }
         }
 
-        async function loadData() {
-            showToast('🔄 Loading data...');
-            try {
-                const logsResult = await callGoogleScript('getAllLogs');
-                if (logsResult.success !== false) {
-                    auditLogs = Array.isArray(logsResult) ? logsResult : [];
-                    renderLogs();
-                    updateStats();
-                }
-
-                const summaryResult = await callGoogleScript('getInventorySummary');
-                if (summaryResult.success !== false) {
-                    inventorySummary = Array.isArray(summaryResult) ? summaryResult : [];
-                    renderSummary();
-                    updateSummaryStats();
-                }
-
-                // Load Blank Sticker count
-                const blankResult = await callGoogleScript('getBlankStickerCount');
-                if (blankResult && blankResult.count !== undefined) {
-                    blankStickersCount = parseInt(blankResult.count) || 0;
-                    updateBlankDisplay();
-                }
-                
-                showToast('✅ Data loaded successfully!');
-            } catch (error) { console.error(error); }
+async function loadData() {
+    showToast('🔄 Loading data...');
+    try {
+        const logsResult = await callGoogleScript('getAllLogs');
+        if (logsResult.success !== false) {
+            auditLogs = Array.isArray(logsResult) ? logsResult : [];
+            renderLogs();
+            updateStats();
         }
 
-        // Blank Sticker Logic
-        async function modifyBlankStickers(amount) {
-            showToast(`⏳ Adding ${amount}...`);
-            blankStickersCount += amount;
-            updateBlankDisplay();
+        const summaryResult = await callGoogleScript('getInventorySummary');
+        if (summaryResult.success !== false) {
+            inventorySummary = Array.isArray(summaryResult) ? summaryResult : [];
+            renderSummary();
+            // We call updateBlankDisplay here to refresh the Total Hold card
+            updateBlankDisplay(); 
+        }
 
+        const blankResult = await callGoogleScript('getBlankStickerCount');
+        if (blankResult) {
+            blankStickersCount = parseInt(blankResult.withNumbers) || 0;
+            blankStickersNoNumsCount = parseInt(blankResult.withoutNumbers) || 0;
+            updateBlankDisplay();
+        }
+        
+        showToast('✅ Data loaded successfully!');
+    } catch (error) { 
+        console.error(error); 
+    }
+}
+
+        // Blank Sticker Logic
+async function modifyBlankStickers(amount, type) {
+            showToast(`⏳ Updating stock...`);
+
+            // NEW LOGIC: If adding to "With Numbers" (> 0), deduct from "Without Numbers" pool
+            if (type === 'with' && amount > 0) {
+                blankStickersCount += amount;
+                blankStickersNoNumsCount -= amount; // Deduct the converted amount
+
+                // Make two separate calls since we are updating both pools in the sheet
+                const resWith = await callGoogleScript('updateBlankStickers', { 
+                    newTotal: blankStickersCount, 
+                    type: 'with' 
+                });
+                
+                const resWithout = await callGoogleScript('updateBlankStickers', { 
+                    newTotal: blankStickersNoNumsCount, 
+                    type: 'without' 
+                });
+
+                if (resWith.success && resWithout.success) {
+                    updateBlankDisplay();
+                    showToast(`✅ Converted ${amount} stickers! Stock updated.`);
+                } else {
+                    showToast('❌ Error updating stock in Sheet');
+                }
+                return; // Exit early so we don't run the default logic below
+            }
+
+            // DEFAULT LOGIC: For manual deductions (-) or adding to "Without Numbers"
+            let newTotal;
+            if (type === 'without') {
+                blankStickersNoNumsCount += amount;
+                newTotal = blankStickersNoNumsCount;
+            } else {
+                blankStickersCount += amount;
+                newTotal = blankStickersCount;
+            }
+
+            // Call the script with the 'type' parameter included
             const result = await callGoogleScript('updateBlankStickers', { 
-                newTotal: blankStickersCount,
-                added: amount 
+                newTotal: newTotal, 
+                type: type 
             });
 
             if (result.success) {
-                showToast(`✅ Added ${amount} blank stickers!`);
+                updateBlankDisplay();
+                showToast('✅ Stock updated in Sheet');
             }
         }
 
-        async function resetBlankStickers() {
-            if (!confirm("Reset blank sticker stock to 0?")) return;
-            blankStickersCount = 0;
-            updateBlankDisplay();
-            await callGoogleScript('updateBlankStickers', { newTotal: 0 });
-            showToast('🗑️ Stock reset');
-        }
+    function updateBlankDisplay() {
+    // 1. Update "With Numbers" displays
+    document.querySelectorAll('#totalBlankStickers').forEach(el => {
+        el.textContent = blankStickersCount.toLocaleString();
+    });
 
-        function updateBlankDisplay() {
-            const el = document.getElementById('totalBlankStickers');
-            if (el) el.textContent = blankStickersCount.toLocaleString();
-        }
-
+    // 2. Update "Without Numbers" displays
+    document.querySelectorAll('#totalBlankNoNums').forEach(el => {
+        el.textContent = blankStickersNoNumsCount.toLocaleString();
+    });
+    
+    // 3. Update the Total Hold card (Sum of all item logs)
+    const totalHoldEl = document.getElementById('summaryTotalQty');
+    if (totalHoldEl) {
+        const logTotal = auditLogs.reduce((s, l) => s + (parseInt(l.quantity) || 0), 0);
+        totalHoldEl.textContent = logTotal.toLocaleString();
+    }
+}
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
         });
 
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tab + 'Tab'));
-            if (tab === 'summary') refreshSummary();
-        }
+        async function switchTab(tab) {
+    currentTab = tab;
+    
+    // Toggle active class on buttons
+    document.querySelectorAll('.tab-btn').forEach(b => 
+        b.classList.toggle('active', b.dataset.tab === tab)
+    );
+    
+    // Toggle active class on content sections
+    document.querySelectorAll('.tab-content').forEach(c => 
+        c.classList.toggle('active', c.id === tab + 'Tab')
+    );
+
+    // NEW: If switching to Summary, fetch the latest data from Google Sheets
+    if (tab === 'summary') {
+        await loadData(); // This calls your GS script and runs renderSummary()
+    }
+}
 
         // Form handling
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const itemName = document.getElementById('itemName').value.trim();
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const date = document.getElementById('date').value;
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    const itemName = document.getElementById('itemName').value.trim();
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const date = document.getElementById('date').value;
 
-            if (!itemName || !quantity || !date) return showToast('⚠️ Fill all fields');
+    if (!itemName || !quantity || !date) return showToast('⚠️ Fill all fields');
 
-            const logData = { itemName, quantity, date };
-            if (editingLogId) logData.id = editingLogId;
+    const isEditing = editingLogId !== null;
+    const logData = { itemName, quantity, date };
+    if (isEditing) logData.id = editingLogId;
 
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '⏳ Saving...';
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    
+    // 1. Visual Notification
+    showToast(isEditing ? '⏳ Updating Log...' : '⏳ Adding Log...');
+    submitBtn.innerHTML = '⏳ Processing...';
 
-            const result = await callGoogleScript(editingLogId ? 'updateLog' : 'addLog', logData);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-            
-            if (result.success) {
-                showToast(editingLogId ? '✅ Log updated!' : '✅ Log added!');
-                resetForm();
-                await loadData();
-            }
-        }
+    // 2. Execute the Google Script
+    const result = await callGoogleScript(isEditing ? 'updateLog' : 'addLog', logData);
+    
+    // 3. UI Logic for Success
+    if (result.success || result) { 
+        showToast(isEditing ? '✅ Update Successful!' : '✅ Added Successfully!');
+        
+        // BACK TO "ADD LOG": This clears the editing ID and resets the button text
+        resetForm();
+        
+        // AUTO REFRESH: Fetch the new data from the sheet immediately
+        await loadData(); 
+        
+    } else {
+        showToast('❌ Save failed. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = isEditing ? '💾 Update Log' : '➕ Add Log';
+    }
+}
 
-        function resetForm() {
-            editingLogId = null;
-            document.getElementById('itemName').value = '';
-            document.getElementById('quantity').value = '';
-            setDateToday();
-            document.getElementById('submitBtn').innerHTML = '➕ Add Log';
-            document.getElementById('cancelBtn').classList.remove('visible');
-            closeDropdown();
-        }
+function resetForm() {
+    editingLogId = null; // Important: clears the "Edit" state
+    document.getElementById('itemName').value = '';
+    document.getElementById('quantity').value = '';
+    setDateToday();
+    
+    // Changes the button text back to the original Add state
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerHTML = '➕ Add Log';
+    submitBtn.disabled = false;
+    
+    document.getElementById('cancelBtn').classList.remove('visible');
+    closeDropdown();
+}
 
         function cancelEdit() { resetForm(); showToast('↩️ Canceled edit'); }
 
@@ -911,23 +1033,135 @@
         }
 
         async function deleteLog(id) {
-            if (!confirm('Delete this log?')) return;
-            const res = await callGoogleScript('deleteLog', { logId: id });
-            if (res.success) { showToast('🗑️ Deleted'); await loadData(); }
-        }
+    // 1. Confirm with the user
+    if (!confirm('Are you sure you want to delete this log?')) return;
 
-        function renderSummary() {
-            const tbody = document.getElementById('summaryTableBody');
-            if (!inventorySummary.length) return;
-            tbody.innerHTML = inventorySummary.map(item => `
-                <tr>
-                    <td>${escapeHtml(item.itemName)}</td>
-                    <td class="total-qty">${item.totalQuantity.toLocaleString()}</td>
-                    <td>${item.logCount}</td>
-                    <td>${formatDate(item.lastUpdated)}</td>
-                </tr>
-            `).join('');
+    try {
+        // 2. Visual feedback that the process started
+        showToast('⏳ Deleting log...');
+        
+        // 3. Execute the Google Script
+        const res = await callGoogleScript('deleteLog', { logId: id });
+
+        // 4. Handle result
+        if (res && res.success !== false) {
+            showToast('🗑️ Log deleted successfully!');
+            
+            // 5. Refresh the data to update the UI and stats
+            await loadData(); 
+        } else {
+            showToast('❌ Delete failed: ' + (res.message || 'Unknown error'));
         }
+    } catch (error) {
+        console.error('Delete Error:', error);
+        showToast('❌ Error connecting to server');
+    }
+}
+
+function renderSummary() {
+    const tbody = document.getElementById('summaryTableBody');
+    const stockBody = document.getElementById('stockBreakdownBody');
+
+    // --- PART A: Render Stock Breakdown Table ---
+    // Logic: Calculate how many full sets of 200 and 180 exist in the 'With Numbers' pool
+ const count200 = Math.floor(blankStickersCount / 200);
+    const remainderAfter200 = blankStickersCount % 200;
+    const count180 = Math.floor(remainderAfter200 / 180);
+    const looseStickers = remainderAfter200 % 180;
+    
+    // This is the subtotal of the 'With Numbers' pool (e.g., 800 + 180 = 980)
+    const subtotalWithNumbers = blankStickersCount; 
+
+    stockBody.innerHTML = `
+        <tr style="background: #f8f9ff; border-top: 2px solid #ddd;">
+            <td><strong>TOTAL WITHOUT NUMBERS</strong> (Bulk)</td>
+            <td style="text-align: right; font-weight: 800; color: var(--primary);">${blankStickersNoNumsCount.toLocaleString()}</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 25px; color: #666;">└─ Sets of 200 (With Numbers)</td>
+            <td style="text-align: right;">${count200} Sets</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 25px; color: #666;">└─ Sets of 180 (With Numbers)</td>
+            <td style="text-align: right;">${count180} Sets</td>
+        </tr>
+        ${looseStickers > 0 ? `
+        <tr>
+            <td style="padding-left: 25px; color: #666;">└─ Loose Stickers</td>
+            <td style="text-align: right;">${looseStickers} pcs</td>
+        </tr>` : ''}
+        <tr style="background: #ecf0f1; font-weight: 700;">
+            <td style="text-align: right; padding-right: 15px;">SUBTOTAL (With Numbers):</td>
+            <td style="text-align: right; color: var(--dark);">${subtotalWithNumbers.toLocaleString()}</td>
+        </tr>
+        <tr style="background: var(--dark); color: white;">
+            <td style="font-weight: bold;">TOTAL UNUSED STOCK (All Blanks)</td>
+            <td style="text-align: right; font-weight: 800; color: var(--primary-dark);">
+                ${(blankStickersCount + blankStickersNoNumsCount).toLocaleString()}
+            </td>
+        </tr>
+    `;
+
+    // --- PART B: Render Item Logs Table ---
+    if (!auditLogs.length) {
+        tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No logs found</td></tr>';
+        return;
+    }
+
+    const sortedLogs = [...auditLogs].sort((a, b) => 
+        a.itemName.localeCompare(b.itemName, undefined, {sensitivity: 'base'})
+    );
+
+    const groups = sortedLogs.reduce((acc, log) => {
+        const name = log.itemName.toUpperCase().trim();
+        if (!acc[name]) acc[name] = [];
+        acc[name].push(log);
+        return acc;
+    }, {});
+
+    let html = '';
+    let grandTotalHold = 0;
+
+    for (const itemName in groups) {
+        const logs = groups[itemName];
+        let itemSubTotal = 0;
+
+        html += `
+            <tr class="item-group-header" style="font-weight: 700; color: var(--dark); background-color: #f8f9ff;">
+                <td>${escapeHtml(itemName)}</td>
+                <td></td>
+            </tr>`;
+
+        logs.forEach((log) => {
+            const qty = parseInt(log.quantity) || 0;
+            itemSubTotal += qty;
+            html += `
+                <tr style="color: #555;">
+                    <td style="padding-left: 25px; color: #888;">└─ ${formatDate(log.date)}</td>
+                    <td style="text-align: right; padding-right: 20px;">${qty.toLocaleString()}</td>
+                </tr>`;
+        });
+
+        html += `
+            <tr class="item-group-total">
+                <td style="font-weight: 700; color: var(--primary); text-align: right; padding-right: 20px;">ITEM TOTAL:</td>
+                <td style="font-weight: 800; color: var(--success); font-size: 15px; text-align: right; padding-right: 20px; border-top: 1px solid #eee;">
+                    ${itemSubTotal.toLocaleString()}
+                </td>
+            </tr>`;
+        grandTotalHold += itemSubTotal;
+    }
+
+    html += `
+        <tr style="background: #f39c12; color: white; font-size: 16px; font-weight: 800;">
+            <td style="padding: 15px; text-align: right; text-transform: uppercase;">Grand Total Hold:</td>
+            <td style="padding: 15px; text-align: right; padding-right: 20px;">
+                ${grandTotalHold.toLocaleString()}
+            </td>
+        </tr>`;
+
+    tbody.innerHTML = html;
+}
 
         function updateStats() {
             document.getElementById('totalItems').textContent = auditLogs.length;
@@ -935,26 +1169,86 @@
         }
 
         function updateSummaryStats() {
-            document.getElementById('uniqueItems').textContent = inventorySummary.length;
-            document.getElementById('summaryTotalQty').textContent = inventorySummary.reduce((s, i) => s + i.totalQuantity, 0).toLocaleString();
-        }
+    // Update the Total Hold card (formerly Total Stock)
+    const summaryTotalEl = document.getElementById('summaryTotalQty');
+    if (summaryTotalEl) {
+        summaryTotalEl.textContent = inventorySummary.reduce((s, i) => s + i.totalQuantity, 0).toLocaleString();
+    }
+}
 
-        async function copyAllLogs() {
-            const text = auditLogs.map(l => `${l.quantity}x ${l.itemName} (${l.date})`).join('\n');
-            await navigator.clipboard.writeText(text);
-            showToast('📋 Copied to clipboard');
-        }
+async function copyAllLogs() {
+    if (!auditLogs || auditLogs.length === 0) {
+        showToast('⚠️ No logs to copy!');
+        return;
+    }
 
-        async function clearAllLogs() {
-            if (!confirm('Clear EVERYTHING?')) return;
-            const res = await callGoogleScript('clearAllLogs');
-            if (res.success) { showToast('🗑️ Cleared'); await loadData(); }
-        }
+    // 1. Group logs by Item Name, then by Date
+    const groupedData = auditLogs.reduce((acc, log) => {
+        const name = log.itemName.toUpperCase().trim();
+        const date = formatDate(log.date);
+        const qty = parseInt(log.quantity) || 0;
 
-        async function refreshSummary() {
-            showToast('🔄 Refreshing...');
-            await loadData();
+        if (!acc[name]) acc[name] = { dates: {}, itemTotal: 0 };
+        
+        // Sum quantities for the same date under the same item
+        acc[name].dates[date] = (acc[name].dates[date] || 0) + qty;
+        acc[name].itemTotal += qty;
+        
+        return acc;
+    }, {});
+
+    // 2. Build the formatted string
+    const today = new Date().toLocaleDateString();
+    let textToCopy = `HOLD STICKER LOGS (${today})\n\n`;
+    let grandTotal = 0;
+
+    for (const [itemName, data] of Object.entries(groupedData)) {
+        textToCopy += `${itemName}\n`;
+        
+        // List each date for this item
+        for (const [date, qty] of Object.entries(data.dates)) {
+            textToCopy += `${date} - ${qty.toLocaleString()}\n`;
         }
+        
+        textToCopy += `TOTAL = ${data.itemTotal.toLocaleString()}\n\n`;
+        grandTotal += data.itemTotal;
+    }
+
+    textToCopy += `====================\nGRAND TOTAL: ${grandTotal.toLocaleString()}`;
+
+    // 3. Execution with Fallback to prevent "Copy Failed"
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            showToast('📋 Copied Successfully!');
+            return;
+        } catch (err) {
+            console.warn('Modern copy failed, trying fallback...');
+        }
+    }
+
+    // Final Fallback for local files or non-HTTPS
+    try {
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+            showToast('📋 Copied (Fallback Mode)');
+        } else {
+            throw new Error();
+        }
+    } catch (err) {
+        showToast('❌ Still failing? Try using Chrome.');
+    }
+}
 
         // Utilities
         function escapeHtml(t) { return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
@@ -965,6 +1259,23 @@
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
+        // New function to specifically handle the deduction input
+async function handleDeduction(type) {
+    const inputId = (type === 'without') ? 'manualBlankWithout' : 'manualBlankWith';
+    const input = document.getElementById(inputId);
+    const val = parseInt(input.value);
+    
+    if (isNaN(val) || val <= 0) {
+        showToast('⚠️ Enter a valid quantity to deduct');
+        return;
+    }
+
+    await modifyBlankStickers(-val, type);
+    input.value = '';
+}
+
     </script>
 </body>
 </html>
+
+
