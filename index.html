@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hold Sticker Logs</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #4facfe;
@@ -25,40 +26,49 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--dark);
-        }
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0; /* Remove padding to touch edges */
+    margin: 0;
+    color: var(--dark);
+}
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
+    width: 100%;       /* Force full width */
+    max-width: 100%;    /* Remove the 1400px limit */
+    min-height: 100vh;  /* Ensure it fills the height of the screen */
+    margin: 0;          /* Remove centered margin */
+    background: white;
+    border-radius: 0;   /* Square edges look better for full-page */
+    box-shadow: none;   /* Shadow isn't needed if it fills the screen */
+    display: flex;
+    flex-direction: column;
+}
 
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 30px;
+            background: #2c3e50; /* A clean, professional slate gray */
+            color: #ffffff;      /* Keeps text readable */
+            padding: 20px 30px;
             text-align: center;
+            border-bottom: 3px solid #1a252f; /* A slightly darker gray for depth */
         }
 
-        .header h1 {
+       .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
             letter-spacing: -0.5px;
+            color: #ffffff;      /* Ensures the title remains bright */
         }
 
         .tabs {
-            display: flex;
-            background: var(--light-bg);
-            border-bottom: 3px solid #e1e5e9;
-        }
+    display: flex;
+    background: var(--light-bg);
+    border-bottom: 3px solid #e1e5e9;
+    position: sticky; /* Keeps tabs visible when scrolling */
+    top: 0;
+    z-index: 1000;
+}
 
         .tab-btn {
             flex: 1;
@@ -313,12 +323,8 @@
         .btn-clear-all { background: var(--danger); }
 
         .logs, ..summary-table-container {
-    width: 100%;
-    max-width: 1000px; /* Optional: adjust based on preference */
-    margin: 0 auto;
-    border: 1px solid #e1e5e9;
-    border-radius: 12px;
-    overflow: hidden;
+    max-height: none !important;
+    overflow: visible !important;
 }
 
         .logs::-webkit-scrollbar,
@@ -417,40 +423,39 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .summary-table {
-   width: 100%;
-    border-collapse: collapse;
-    background: white;
-    font-size: 14px;
+      .summary-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-        .summary-table th {
-    position: sticky;
-    top: 0;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    padding: 12px 15px;
-    text-align: left;
-    font-weight: 700;
-    z-index: 10;
+     .summary-table th {
+    padding: 18px 20px;
+    font-size: 18px; /* Increased from 14px */
+    font-weight: 800; /* Extra Bold */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    background-color: #f8f9ff;
 }
 
-        .summary-table td {
-    padding: 8px 15px;
-    border-bottom: 1px solid #f0f2f5;
-    line-height: 1.4;
+.summary-table td {
+    padding: 12px 15px; /* Increased padding for better spacing */
+    font-size: 16px;    /* Increased from 12px */
+    font-weight: 700;    /* Bold */
+    border-bottom: 1px solid #f0f0f0;
 }
 .item-group-header td {
-    background-color: #f8f9ff !important;
-    font-size: 13px;
-    border-top: 2px solid #eee;
+    padding-top: 15px !important;
+    padding-bottom: 10px !important;
+    font-size: 18px; /* Larger category names */
+    background-color: #fcfdfe !important;
+    border-bottom: 2px solid var(--primary) !important;
+    color: var(--dark);
 }
-
 .item-group-total td {
-    background-color: #fff;
-    padding-bottom: 15px !important;
+    font-size: 17px;
+    padding-top: 10px !important;
+    padding-bottom: 20px !important;
 }
         .summary-table tr:hover {
             background: rgba(79, 172, 254, 0.05);
@@ -610,6 +615,7 @@
                         <div class="global-actions">
                             <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
                             <button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
+                            <button class="btn global-btn" onclick="triggerHoldUpload()" style="background: #8e44ad;">📤 Upload to HOLD Sheet</button>
                         </div>
                     </div>
                 </div>
@@ -653,8 +659,14 @@
                 </tbody>
         </table>
     </div>
+    
 
-    <h3 style="margin-bottom: 15px; color: var(--dark);">📋 Item Logs Summary</h3>
+ <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: var(--dark);">📋 Item Logs Summary</h3>
+        <button class="btn add-btn" onclick="copyTableAsImage()" style="height: auto; padding: 8px 16px; font-size: 14px; background: var(--dark);">
+            📋 Copy as Image
+        </button>
+    </div>
     <div class="summary-table-container">
         <table class="summary-table" id="summaryTable">
             <thead>
@@ -1063,13 +1075,10 @@ function renderSummary() {
     const stockBody = document.getElementById('stockBreakdownBody');
 
     // --- PART A: Render Stock Breakdown Table ---
-    // Logic: Calculate how many full sets of 200 and 180 exist in the 'With Numbers' pool
- const count200 = Math.floor(blankStickersCount / 200);
+    const count200 = Math.floor(blankStickersCount / 200);
     const remainderAfter200 = blankStickersCount % 200;
     const count180 = Math.floor(remainderAfter200 / 180);
     const looseStickers = remainderAfter200 % 180;
-    
-    // This is the subtotal of the 'With Numbers' pool (e.g., 800 + 180 = 980)
     const subtotalWithNumbers = blankStickersCount; 
 
     stockBody.innerHTML = `
@@ -1108,6 +1117,7 @@ function renderSummary() {
         return;
     }
 
+    // Alphabetical sort for Item Names
     const sortedLogs = [...auditLogs].sort((a, b) => 
         a.itemName.localeCompare(b.itemName, undefined, {sensitivity: 'base'})
     );
@@ -1124,6 +1134,10 @@ function renderSummary() {
 
     for (const itemName in groups) {
         const logs = groups[itemName];
+        
+        // --- NEW SORTING LOGIC: Latest Date to Oldest Date ---
+        logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         let itemSubTotal = 0;
 
         html += `
@@ -1136,9 +1150,13 @@ function renderSummary() {
             const qty = parseInt(log.quantity) || 0;
             itemSubTotal += qty;
             html += `
-                <tr style="color: #555;">
-                    <td style="padding-left: 25px; color: #888;">└─ ${formatDate(log.date)}</td>
-                    <td style="text-align: right; padding-right: 20px;">${qty.toLocaleString()}</td>
+                <tr style="color: #666;">
+                    <td style="padding-left: 20px;">
+                        <span style="color: #999; margin-right: 10px;">• ${formatDate(log.date)}</span>
+                    </td>
+                    <td style="text-align: right; padding-right: 20px; font-weight: 500;">
+                        ${qty.toLocaleString()}
+                    </td>
                 </tr>`;
         });
 
@@ -1153,9 +1171,9 @@ function renderSummary() {
     }
 
     html += `
-        <tr style="background: #f39c12; color: white; font-size: 16px; font-weight: 800;">
-            <td style="padding: 15px; text-align: right; text-transform: uppercase;">Grand Total Hold:</td>
-            <td style="padding: 15px; text-align: right; padding-right: 20px;">
+        <tr style="background: #f39c12; color: white; font-size: 14px; font-weight: 700;">
+            <td style="padding: 10px; text-align: right; text-transform: uppercase;">Grand Total Hold:</td>
+            <td style="padding: 10px; text-align: right; padding-right: 20px;">
                 ${grandTotalHold.toLocaleString()}
             </td>
         </tr>`;
@@ -1182,52 +1200,71 @@ async function copyAllLogs() {
         return;
     }
 
-    // 1. Group logs by Item Name, then by Date
+    // 1. Calculate Stock Breakdown (Matching your UI logic)
+    const count200 = Math.floor(blankStickersCount / 200);
+    const remainderAfter200 = blankStickersCount % 200;
+    const count180 = Math.floor(remainderAfter200 / 180);
+    const looseStickers = remainderAfter200 % 180;
+    const totalAllBlanks = blankStickersCount + blankStickersNoNumsCount;
+
+    // 2. Group and Sort Logs by Item Name
     const groupedData = auditLogs.reduce((acc, log) => {
         const name = log.itemName.toUpperCase().trim();
         const date = formatDate(log.date);
         const qty = parseInt(log.quantity) || 0;
 
-        if (!acc[name]) acc[name] = { dates: {}, itemTotal: 0 };
-        
-        // Sum quantities for the same date under the same item
-        acc[name].dates[date] = (acc[name].dates[date] || 0) + qty;
+        if (!acc[name]) acc[name] = { logs: [], itemTotal: 0 };
+        acc[name].logs.push({ date: log.date, dateStr: date, qty: qty });
         acc[name].itemTotal += qty;
         
         return acc;
     }, {});
 
-    // 2. Build the formatted string
+    // 3. Build the formatted string
     const today = new Date().toLocaleDateString();
-    let textToCopy = `HOLD STICKER LOGS (${today})\n\n`;
-    let grandTotal = 0;
+    let textToCopy = `📦 STOCK SUMMARY (${today})\n`;
+    textToCopy += `------------------------------\n`;
+    textToCopy += `WITHOUT NUMBERS (Bulk): ${blankStickersNoNumsCount.toLocaleString()}\n`;
+    textToCopy += `WITH NUMBERS (Total): ${blankStickersCount.toLocaleString()}\n`;
+    textToCopy += `  └─ Sets of 200: ${count200}\n`;
+    textToCopy += `  └─ Sets of 180: ${count180}\n`;
+    if (looseStickers > 0) textToCopy += `  └─ Loose: ${looseStickers}\n`;
+    textToCopy += `TOTAL UNUSED STOCK: ${totalAllBlanks.toLocaleString()}\n`;
+    textToCopy += `------------------------------\n\n`;
+    
+    textToCopy += `📋 HOLD STICKER LOGS\n\n`;
+    let grandTotalHold = 0;
+    const sortedItemNames = Object.keys(groupedData).sort();
 
-    for (const [itemName, data] of Object.entries(groupedData)) {
+    for (const itemName of sortedItemNames) {
+        const data = groupedData[itemName];
         textToCopy += `${itemName}\n`;
         
-        // List each date for this item
-        for (const [date, qty] of Object.entries(data.dates)) {
-            textToCopy += `${date} - ${qty.toLocaleString()}\n`;
+        // Sort logs: Latest to Oldest
+        data.logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        for (const entry of data.logs) {
+            textToCopy += `${entry.dateStr} - ${entry.qty.toLocaleString()}\n`;
         }
         
-        textToCopy += `TOTAL = ${data.itemTotal.toLocaleString()}\n\n`;
-        grandTotal += data.itemTotal;
+        textToCopy += `ITEM TOTAL = ${data.itemTotal.toLocaleString()}\n\n`;
+        grandTotalHold += data.itemTotal;
     }
 
-    textToCopy += `====================\nGRAND TOTAL: ${grandTotal.toLocaleString()}`;
+    textToCopy += `==============================\n`;
+    textToCopy += `GRAND TOTAL HOLD: ${grandTotalHold.toLocaleString()}`;
 
-    // 3. Execution with Fallback to prevent "Copy Failed"
+    // 4. Execution with Fallback
     if (navigator.clipboard && window.isSecureContext) {
         try {
             await navigator.clipboard.writeText(textToCopy);
-            showToast('📋 Copied Successfully!');
+            showToast('📋 Summary & Logs Copied!');
             return;
         } catch (err) {
             console.warn('Modern copy failed, trying fallback...');
         }
     }
 
-    // Final Fallback for local files or non-HTTPS
     try {
         const textArea = document.createElement("textarea");
         textArea.value = textToCopy;
@@ -1239,14 +1276,9 @@ async function copyAllLogs() {
         textArea.select();
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        
-        if (successful) {
-            showToast('📋 Copied (Fallback Mode)');
-        } else {
-            throw new Error();
-        }
+        if (successful) showToast('📋 Copied (Fallback Mode)');
     } catch (err) {
-        showToast('❌ Still failing? Try using Chrome.');
+        showToast('❌ Copy failed.');
     }
 }
 
@@ -1273,9 +1305,59 @@ async function handleDeduction(type) {
     await modifyBlankStickers(-val, type);
     input.value = '';
 }
+async function copyTableAsImage() {
+    const tableContainer = document.getElementById('summaryTable');
+    
+    if (!tableContainer) {
+        showToast('⚠️ Table not found!');
+        return;
+    }
 
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Copying...';
+    btn.disabled = true;
+
+    try {
+        // High-quality capture settings
+        const canvas = await html2canvas(tableContainer, {
+            scale: 2, 
+            backgroundColor: "#ffffff",
+            useCORS: true,
+            logging: false
+        });
+
+        // Convert to Blob and Copy
+        canvas.toBlob(async (blob) => {
+            try {
+                const data = [new ClipboardItem({ [blob.type]: blob })];
+                await navigator.clipboard.write(data);
+                showToast('📋 Image copied to clipboard!');
+            } catch (err) {
+                console.error(err);
+                showToast('❌ Browser blocked copy. See instructions below.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }, 'image/png');
+
+    } catch (error) {
+        showToast('❌ Capture failed.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+async function triggerHoldUpload() {
+    showToast('⏳ Processing HOLD quantities...');
+    const result = await callGoogleScript('uploadHoldQuantities');
+    if (result.success) {
+        showToast('✅ HOLD Sticker Upload Updated!');
+    } else {
+        showToast('❌ Error: ' + result.message);
+    }
+}
     </script>
 </body>
+
 </html>
-
-
