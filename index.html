@@ -698,8 +698,10 @@
                     <small>Stock With Numbers</small>
                 </div>
                 <div class="blank-btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <button class="btn add-btn" onclick="modifyBlankStickers(180, 'with')" style="background: var(--success);">+180</button>
-                    <button class="btn add-btn" onclick="modifyBlankStickers(200, 'with')" style="background: var(--primary);">+200</button>
+                  <button class="btn add-btn" onclick="modifyBlankStickers(200, 'with')" style="background: var(--primary);">+200</button>
+                    <button class="btn add-btn" onclick="modifyBlankStickers(1000, 'with')" style="background: #8e44ad;">📦 1 Bundle (1k)</button>
+                    
+                    
                     <span style="margin: 0 10px; color: var(--gray);">|</span>
                     <input type="number" id="manualBlankWith" placeholder="Qty" style="width: 80px; padding: 10px; border-radius: 12px; border: 2px solid var(--danger);">
                     <button class="btn add-btn" onclick="handleDeduction('with')" style="background: var(--danger);">➖ Deduct</button>
@@ -718,11 +720,10 @@
                 </div>
                 <div class="blank-btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                     <button class="btn add-btn" onclick="modifyBlankStickers(1000, 'without')" style="background: var(--success);">+1000</button>
-                    <button class="btn add-btn" onclick="modifyBlankStickers(12000, 'without')" style="background: var(--dark);">+12000 (Box)</button>
+                    <button class="btn add-btn" onclick="modifyBlankStickers(12000, 'without')" style="background: var(--dark);">+12000 📦 </button>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -1075,10 +1076,8 @@ function renderSummary() {
     const stockBody = document.getElementById('stockBreakdownBody');
 
     // --- PART A: Render Stock Breakdown Table ---
+    // Calculate only Sets of 200 from the "With Numbers" count
     const count200 = Math.floor(blankStickersCount / 200);
-    const remainderAfter200 = blankStickersCount % 200;
-    const count180 = Math.floor(remainderAfter200 / 180);
-    const looseStickers = remainderAfter200 % 180;
     const subtotalWithNumbers = blankStickersCount; 
 
     stockBody.innerHTML = `
@@ -1090,15 +1089,6 @@ function renderSummary() {
             <td style="padding-left: 25px; color: #666;">└─ Sets of 200 (With Numbers)</td>
             <td style="text-align: right;">${count200} Sets</td>
         </tr>
-        <tr>
-            <td style="padding-left: 25px; color: #666;">└─ Sets of 180 (With Numbers)</td>
-            <td style="text-align: right;">${count180} Sets</td>
-        </tr>
-        ${looseStickers > 0 ? `
-        <tr>
-            <td style="padding-left: 25px; color: #666;">└─ Loose Stickers</td>
-            <td style="text-align: right;">${looseStickers} pcs</td>
-        </tr>` : ''}
         <tr style="background: #ecf0f1; font-weight: 700;">
             <td style="text-align: right; padding-right: 15px;">SUBTOTAL (With Numbers):</td>
             <td style="text-align: right; color: var(--dark);">${subtotalWithNumbers.toLocaleString()}</td>
@@ -1135,7 +1125,7 @@ function renderSummary() {
     for (const itemName in groups) {
         const logs = groups[itemName];
         
-        // --- NEW SORTING LOGIC: Latest Date to Oldest Date ---
+        // Latest Date to Oldest Date
         logs.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         let itemSubTotal = 0;
