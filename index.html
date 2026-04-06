@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hold Sticker Logs</title>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+    /* Ensure the calendar popup is always on top */
+.litepicker {
+    z-index: 9999 !important;
+}
         :root {
             --primary: #4facfe;
             --primary-dark: #00f2fe;
@@ -615,7 +621,6 @@
                         <div class="global-actions">
                             <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
                             <button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
-                            <button class="btn global-btn" onclick="triggerHoldUpload()" style="background: #8e44ad;">📤 Upload to HOLD Sheet</button>
                         </div>
                     </div>
                 </div>
@@ -661,12 +666,21 @@
     </div>
     
 
- <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="margin: 0; color: var(--dark);">📋 Item Logs Summary</h3>
-        <button class="btn add-btn" onclick="copyTableAsImage()" style="height: auto; padding: 8px 16px; font-size: 14px; background: var(--dark);">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 15px; flex-wrap: wrap; background: #f8f9ff; padding: 15px; border-radius: 12px;">
+    <h3 style="margin: 0; color: var(--dark);">📋 Item Logs Summary</h3>
+    
+    <div style="display: flex; gap: 10px; align-items: center; flex-grow: 1; max-width: 550px;">
+        <div style="position: relative; flex-grow: 1;">
+            <input type="text" id="summaryRangePicker" placeholder="📅 Select Date Range (Click to drag/select)" 
+                   style="width: 100%; padding: 10px 15px; border-radius: 8px; border: 2px solid #4facfe; font-size: 14px; cursor: pointer; background: white;">
+        </div>
+
+        <button class="btn add-btn" onclick="copyTableAsImage()" 
+                style="height: 42px; padding: 0 20px; font-size: 14px; background: var(--dark); white-space: nowrap;">
             📋 Copy as Image
         </button>
     </div>
+</div>
     <div class="summary-table-container">
         <table class="summary-table" id="summaryTable">
             <thead>
@@ -808,17 +822,23 @@ async function loadData() {
     showToast('🔄 Loading data...');
     try {
         const logsResult = await callGoogleScript('getAllLogs');
-        if (logsResult.success !== false) {
-            auditLogs = Array.isArray(logsResult) ? logsResult : [];
+        
+        // Improved check: Ensure we actually got an array back
+        if (logsResult && Array.isArray(logsResult)) {
+            auditLogs = logsResult;
+            renderLogs(); 
+        } else if (logsResult && logsResult.data && Array.isArray(logsResult.data)) {
+            auditLogs = logsResult.data;
             renderLogs();
-            updateStats();
+        } else {
+            console.error("Format error:", logsResult);
+            showToast('⚠️ Logs format is incorrect');
         }
 
         const summaryResult = await callGoogleScript('getInventorySummary');
-        if (summaryResult.success !== false) {
-            inventorySummary = Array.isArray(summaryResult) ? summaryResult : [];
+        if (summaryResult) {
+            inventorySummary = Array.isArray(summaryResult) ? summaryResult : (summaryResult.data || []);
             renderSummary();
-            // We call updateBlankDisplay here to refresh the Total Hold card
             updateBlankDisplay(); 
         }
 
@@ -828,10 +848,13 @@ async function loadData() {
             blankStickersNoNumsCount = parseInt(blankResult.withoutNumbers) || 0;
             updateBlankDisplay();
         }
+
+        // --- ADDED SUCCESS NOTIFICATION HERE ---
+        showToast('✅ Data updated successfully!');
         
-        showToast('✅ Data loaded successfully!');
     } catch (error) { 
-        console.error(error); 
+        console.error("Load Data Error:", error);
+        showToast('❌ Failed to load logs');
     }
 }
 
@@ -1012,27 +1035,42 @@ function resetForm() {
         function closeDropdown() { document.getElementById('dropdownContainer').classList.remove('show'); }
 
         // Rendering
-        function renderLogs(filter = '') {
-            const container = document.getElementById('logsContainer');
-            const filtered = auditLogs.filter(l => l.itemName.toLowerCase().includes(filter.toLowerCase()));
-            if (!filtered.length) { container.innerHTML = '<div class="empty-state"><p>No logs found.</p></div>'; return; }
-            container.innerHTML = filtered.map(log => `
-                <div class="log-item">
-                    <div class="log-header">
-                        <div class="item-name">${escapeHtml(log.itemName)}</div>
-                        <div class="quantity">Qty: ${log.quantity.toLocaleString()}</div>
-                    </div>
-                    <div class="log-meta">
-                        <span>📅 ${formatDate(log.date)}</span>
-                        <span>#${log.id}</span>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="action-btn edit-btn" onclick="editLog(${log.id})">✏️ Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteLog(${log.id})">🗑️ Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+function renderLogs(filter = '') {
+    const container = document.getElementById('logsContainer');
+    // Ensure auditLogs is treated as an array
+    const logsToProcess = Array.isArray(auditLogs) ? auditLogs : [];
+    
+    const filtered = logsToProcess.filter(l => 
+        l.itemName && l.itemName.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    // Update Stats Cards
+    const totalQty = filtered.reduce((sum, log) => sum + (parseInt(log.quantity) || 0), 0);
+    document.getElementById('totalItems').textContent = filtered.length;
+    document.getElementById('totalQuantity').textContent = totalQty.toLocaleString();
+
+    if (!filtered.length) { 
+        container.innerHTML = '<div class="empty-state"><p>No logs found.</p></div>'; 
+        return; 
+    }
+
+    container.innerHTML = filtered.map(log => `
+        <div class="log-item">
+            <div class="log-header">
+                <div class="item-name">${escapeHtml(log.itemName)}</div>
+                <div class="quantity">Qty: ${log.quantity.toLocaleString()}</div>
+            </div>
+            <div class="log-meta">
+                <span>📅 ${formatDate(log.date)}</span>
+                <span>#${log.id}</span>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn edit-btn" onclick="editLog(${log.id})">✏️ Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteLog(${log.id})">🗑️ Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
 
         function editLog(id) {
             const log = auditLogs.find(l => l.id == id);
@@ -1074,114 +1112,110 @@ function resetForm() {
 function renderSummary() {
     const tbody = document.getElementById('summaryTableBody');
     const stockBody = document.getElementById('stockBreakdownBody');
+    
+    // Safety check: Get dates from the Litepicker instance if it exists
+    const startDate = (typeof picker !== 'undefined' && picker) ? picker.getStartDate() : null;
+    const endDate = (typeof picker !== 'undefined' && picker) ? picker.getEndDate() : null;
 
-    // --- PART A: Render Stock Breakdown Table ---
-    // Calculate only Sets of 200 from the "With Numbers" count
+    // --- PART A: Render Stock Breakdown (Always visible) ---
     const count200 = Math.floor(blankStickersCount / 200);
-    const subtotalWithNumbers = blankStickersCount; 
-
     stockBody.innerHTML = `
         <tr style="background: #f8f9ff; border-top: 2px solid #ddd;">
-            <td><strong>TOTAL WITHOUT NUMBERS</strong> (Bulk)</td>
+            <td><strong>TOTAL WITHOUT NUMBERS</strong></td>
             <td style="text-align: right; font-weight: 800; color: var(--primary);">${blankStickersNoNumsCount.toLocaleString()}</td>
         </tr>
         <tr>
             <td style="padding-left: 25px; color: #666;">└─ Sets of 200 (With Numbers)</td>
             <td style="text-align: right;">${count200} Sets</td>
         </tr>
-        <tr style="background: #ecf0f1; font-weight: 700;">
-            <td style="text-align: right; padding-right: 15px;">SUBTOTAL (With Numbers):</td>
-            <td style="text-align: right; color: var(--dark);">${subtotalWithNumbers.toLocaleString()}</td>
-        </tr>
         <tr style="background: var(--dark); color: white;">
-            <td style="font-weight: bold;">TOTAL UNUSED STOCK (All Blanks)</td>
+            <td style="font-weight: bold;">TOTAL UNUSED STOCK</td>
             <td style="text-align: right; font-weight: 800; color: var(--primary-dark);">
                 ${(blankStickersCount + blankStickersNoNumsCount).toLocaleString()}
             </td>
         </tr>
     `;
 
-    // --- PART B: Render Item Logs Table ---
-    if (!auditLogs.length) {
-        tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No logs found</td></tr>';
+    // --- PART B: Date Filtering Logic ---
+    const filteredLogs = auditLogs.filter(log => {
+        if (!startDate || !endDate) return true; 
+        
+        const logDate = new Date(log.date).getTime();
+        const start = startDate.toJSDate().setHours(0, 0, 0, 0);
+        const end = endDate.toJSDate().setHours(23, 59, 59, 999);
+
+        return logDate >= start && logDate <= end;
+    });
+
+    if (!filteredLogs.length) {
+        tbody.innerHTML = '<tr><td colspan="2" class="empty-state" style="padding: 40px; text-align: center;">No logs found for selected dates</td></tr>';
+        document.getElementById('summaryTotalQty').textContent = "0";
         return;
     }
 
-    // Alphabetical sort for Item Names
-    const sortedLogs = [...auditLogs].sort((a, b) => 
-        a.itemName.localeCompare(b.itemName, undefined, {sensitivity: 'base'})
-    );
-
-    const groups = sortedLogs.reduce((acc, log) => {
+    // --- PART C: Render Grouped Table (SORTED BY QUANTITY: HIGH TO LOW) ---
+    // 1. Group logs and calculate sub-totals first
+    const itemGroups = filteredLogs.reduce((acc, log) => {
         const name = log.itemName.toUpperCase().trim();
-        if (!acc[name]) acc[name] = [];
-        acc[name].push(log);
+        if (!acc[name]) {
+            acc[name] = {
+                logs: [],
+                total: 0
+            };
+        }
+        acc[name].logs.push(log);
+        acc[name].total += (parseInt(log.quantity) || 0);
         return acc;
     }, {});
+
+    // 2. Sort the group names based on their calculated totals (Highest first)
+    const sortedItemNames = Object.keys(itemGroups).sort((a, b) => {
+        return itemGroups[b].total - itemGroups[a].total;
+    });
 
     let html = '';
     let grandTotalHold = 0;
 
-    for (const itemName in groups) {
-        const logs = groups[itemName];
+    // 3. Loop through the sorted names to build the HTML
+    sortedItemNames.forEach(itemName => {
+        const group = itemGroups[itemName];
+        const logs = group.logs;
         
-        // Latest Date to Oldest Date
+        // Sort individual logs within the group: Latest Date to Oldest
         logs.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        let itemSubTotal = 0;
+        // Group Header
+        html += `<tr class="item-group-header" style="background-color: #f1f4f9;">
+                    <td style="font-weight: bold;">${escapeHtml(itemName)}</td>
+                    <td style="text-align: right; font-weight: 800; color: var(--primary);"</td>
+                 </tr>`;
 
-        html += `
-            <tr class="item-group-header" style="font-weight: 700; color: var(--dark); background-color: #f8f9ff;">
-                <td>${escapeHtml(itemName)}</td>
-                <td></td>
-            </tr>`;
-
-        logs.forEach((log) => {
+        // Individual Log Rows
+        logs.forEach(log => {
             const qty = parseInt(log.quantity) || 0;
-            itemSubTotal += qty;
-            html += `
-                <tr style="color: #666;">
-                    <td style="padding-left: 20px;">
-                        <span style="color: #999; margin-right: 10px;">• ${formatDate(log.date)}</span>
-                    </td>
-                    <td style="text-align: right; padding-right: 20px; font-weight: 500;">
-                        ${qty.toLocaleString()}
-                    </td>
-                </tr>`;
+            html += `<tr style="color: #555;">
+                        <td style="padding-left: 30px;">• ${formatDate(log.date)}</td>
+                        <td style="text-align: right; padding-right: 20px;">${qty.toLocaleString()}</td>
+                     </tr>`;
         });
 
-        html += `
-            <tr class="item-group-total">
-                <td style="font-weight: 700; color: var(--primary); text-align: right; padding-right: 20px;">ITEM TOTAL:</td>
-                <td style="font-weight: 800; color: var(--success); font-size: 15px; text-align: right; padding-right: 20px; border-top: 1px solid #eee;">
-                    ${itemSubTotal.toLocaleString()}
-                </td>
-            </tr>`;
-        grandTotalHold += itemSubTotal;
-    }
+        // Subtotal for the group (Footer for that item)
+        html += `<tr class="item-group-total" style="border-bottom: 2px solid #eee;">
+                    <td style="text-align: right; font-weight: 600; color: var(--primary);">ITEM TOTAL:</td>
+                    <td style="text-align: right; padding-right: 20px; font-weight: 800; color: var(--success);">${group.total.toLocaleString()}</td>
+                 </tr>`;
+                 
+        grandTotalHold += group.total;
+    });
 
-    html += `
-        <tr style="background: #f39c12; color: white; font-size: 14px; font-weight: 700;">
-            <td style="padding: 10px; text-align: right; text-transform: uppercase;">Grand Total Hold:</td>
-            <td style="padding: 10px; text-align: right; padding-right: 20px;">
-                ${grandTotalHold.toLocaleString()}
-            </td>
-        </tr>`;
+    // Grand Total Row
+    html += `<tr style="background: #f39c12; color: white; font-weight: 700;">
+                <td style="text-align: right; padding: 15px;">GRAND TOTAL HOLD:</td>
+                <td style="text-align: right; padding-right: 20px;">${grandTotalHold.toLocaleString()}</td>
+            </tr>`;
 
     tbody.innerHTML = html;
-}
-
-        function updateStats() {
-            document.getElementById('totalItems').textContent = auditLogs.length;
-            document.getElementById('totalQuantity').textContent = auditLogs.reduce((s, l) => s + l.quantity, 0).toLocaleString();
-        }
-
-        function updateSummaryStats() {
-    // Update the Total Hold card (formerly Total Stock)
-    const summaryTotalEl = document.getElementById('summaryTotalQty');
-    if (summaryTotalEl) {
-        summaryTotalEl.textContent = inventorySummary.reduce((s, i) => s + i.totalQuantity, 0).toLocaleString();
-    }
+    document.getElementById('summaryTotalQty').textContent = grandTotalHold.toLocaleString();
 }
 
 async function copyAllLogs() {
@@ -1224,7 +1258,11 @@ async function copyAllLogs() {
     
     textToCopy += `📋 HOLD STICKER LOGS\n\n`;
     let grandTotalHold = 0;
-    const sortedItemNames = Object.keys(groupedData).sort();
+    
+    // 🔴 THE FIX: Sort by total quantity (highest to lowest) instead of alphabetically
+    const sortedItemNames = Object.keys(groupedData).sort((a, b) => {
+        return groupedData[b].itemTotal - groupedData[a].itemTotal;
+    });
 
     for (const itemName of sortedItemNames) {
         const data = groupedData[itemName];
@@ -1338,15 +1376,26 @@ async function copyTableAsImage() {
         btn.disabled = false;
     }
 }
-async function triggerHoldUpload() {
-    showToast('⏳ Processing HOLD quantities...');
-    const result = await callGoogleScript('uploadHoldQuantities');
-    if (result.success) {
-        showToast('✅ HOLD Sticker Upload Updated!');
-    } else {
-        showToast('❌ Error: ' + result.message);
-    }
-}
+
+let picker; // Ensure this is declared at the top of your <script> tag
+
+window.addEventListener('DOMContentLoaded', () => {
+    picker = new Litepicker({
+        element: document.getElementById('summaryRangePicker'),
+        singleMode: false, 
+        numberOfMonths: 2, 
+        numberOfColumns: 2,
+        format: 'YYYY-MM-DD',
+        setup: (pickerInstance) => {
+            pickerInstance.on('selected', () => {
+                renderSummary(); 
+            });
+            pickerInstance.on('clear:selection', () => {
+                renderSummary(); 
+            });
+        },
+    });
+});
     </script>
 </body>
 
