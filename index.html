@@ -618,10 +618,12 @@
                         <div class="filter-group">
                             <input type="text" id="searchInput" placeholder="🔍 Search items by name...">
                         </div>
-                        <div class="global-actions">
-                            <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
-                            <button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
-                        </div>
+                       <div class="global-actions">
+    <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
+    <button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
+    
+    <button class="btn global-btn" onclick="triggerManualUpload()" style="background: #e67e22; border: 1px solid #d35400;">📤 Upload to Sheet</button>
+</div>
                     </div>
                 </div>
                 
@@ -1396,7 +1398,29 @@ window.addEventListener('DOMContentLoaded', () => {
         },
     });
 });
+async function triggerManualUpload() {
+    // 1. Confirm with the user
+    if (!confirm('This will sync all current logs to the "HOLD Sticker Upload" sheet. Continue?')) return;
+
+    try {
+        showToast('⏳ Uploading to Google Sheets...');
+        
+        // 2. Call the existing upload function in your code.gs
+        const result = await callGoogleScript('uploadHoldQuantities');
+
+        // 3. Handle the response
+        if (result && result.success !== false) {
+            showToast('✅ Upload Successful! Check your Spreadsheet.');
+        } else {
+            showToast('❌ Upload failed: ' + (result.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Upload Error:', error);
+        showToast('❌ Connection error during upload.');
+    }
+}
     </script>
 </body>
 
 </html>
+
