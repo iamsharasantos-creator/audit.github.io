@@ -1399,18 +1399,49 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 async function triggerManualUpload() {
-    // 1. Confirm with the user
-    if (!confirm('This will sync all current logs to the "HOLD Sticker Upload" sheet. Continue?')) return;
+    // 1. Get date range from picker
+    let startDate = null;
+    let endDate = null;
+    
+    if (typeof picker !== 'undefined' && picker) {
+        startDate = picker.getStartDate();
+        endDate = picker.getEndDate();
+    }
+    
+    // 2. If yesterday is selected (single day or range ending yesterday), use yesterday only
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    let uploadDateRange = null;
+    
+    if (startDate && endDate) {
+        const startStr = startDate.toJSDate().toISOString().split('T')[0];
+        const endStr = endDate.toJSDate().toISOString().split('T')[0];
+        
+        // Check if yesterday is selected (either single day or range includes yesterday)
+        if (endStr === yesterdayStr || startStr === yesterdayStr) {
+            uploadDateRange = { startDate: yesterdayStr, endDate: yesterdayStr };
+        }
+    }
+    
+    // 3. Confirm with user (show what will be uploaded)
+    const confirmMsg = uploadDateRange 
+        ? `📤 Upload YESTERDAY's logs only (${yesterdayStr})?`
+        : '📤 Upload ALL logs to "HOLD Sticker Upload" sheet?';
+        
+    if (!confirm(confirmMsg)) return;
 
     try {
-        showToast('⏳ Uploading to Google Sheets...');
+        showToast('⏳ Uploading' + (uploadDateRange ? ' yesterday\'s logs...' : ' all logs...'));
         
-        // 2. Call the existing upload function in your code.gs
-        const result = await callGoogleScript('uploadHoldQuantities');
+        // 4. Pass date range parameter to Google Script
+        const result = await callGoogleScript('uploadHoldQuantities', { 
+            dateRange: uploadDateRange 
+        });
 
-        // 3. Handle the response
         if (result && result.success !== false) {
-            showToast('✅ Upload Successful! Check your Spreadsheet.');
+            showToast(`✅ ${uploadDateRange ? 'Yesterday\'s' : 'All'} logs uploaded successfully!`);
         } else {
             showToast('❌ Upload failed: ' + (result.message || 'Unknown error'));
         }
