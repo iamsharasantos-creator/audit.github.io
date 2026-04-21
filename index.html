@@ -3,128 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hold Sticker Logs</title>
+    <title>Hold Sticker Logs Dashboard</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
-    /* Ensure the calendar popup is always on top */
-.litepicker {
-    z-index: 9999 !important;
+    #newProdName {
+    text-transform: uppercase;
 }
+        /* CSS Variables */
         :root {
-            --primary: #4facfe;
-            --primary-dark: #00f2fe;
-            --success: #11998e;
-            --success-dark: #38ef7d;
-            --danger: #ff416c;
-            --danger-dark: #ff4b2b;
-            --warning: #f7b733;
-            --dark: #2c3e50;
-            --gray: #7f8c8d;
-            --light-bg: #f8f9ff;
+            --primary: #4318FF;
+            --primary-dark: #2B3674;
+            --secondary: #4facfe;
+            --success: #01B574;
+            --danger: #EE5D50;
+            --warning: #FFCE20;
+            --dark: #2B3674;
+            --gray: #A3AED0;
+            --light-bg: #F4F7FE;
+            --white: #FFFFFF;
+            --sidebar-bg: #111C44;
+            --sidebar-hover: #1B254B;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 0; /* Remove padding to touch edges */
-    margin: 0;
-    color: var(--dark);
-}
-
-        .container {
-    width: 100%;       /* Force full width */
-    max-width: 100%;    /* Remove the 1400px limit */
-    min-height: 100vh;  /* Ensure it fills the height of the screen */
-    margin: 0;          /* Remove centered margin */
-    background: white;
-    border-radius: 0;   /* Square edges look better for full-page */
-    box-shadow: none;   /* Shadow isn't needed if it fills the screen */
-    display: flex;
-    flex-direction: column;
-}
-
-        .header {
-            background: #2c3e50; /* A clean, professional slate gray */
-            color: #ffffff;      /* Keeps text readable */
-            padding: 20px 30px;
-            text-align: center;
-            border-bottom: 3px solid #1a252f; /* A slightly darker gray for depth */
+            background-color: var(--light-bg);
+            color: var(--dark);
+            overflow: hidden; /* Prevent body scroll, handle inside layout */
         }
 
-       .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-            color: #ffffff;      /* Ensures the title remains bright */
+        /* --- LAYOUT --- */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
         }
 
-        .tabs {
-    display: flex;
-    background: var(--light-bg);
-    border-bottom: 3px solid #e1e5e9;
-    position: sticky; /* Keeps tabs visible when scrolling */
-    top: 0;
-    z-index: 1000;
-}
-
-        .tab-btn {
-            flex: 1;
-            padding: 20px;
-            border: none;
-            background: transparent;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
             transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5em;
+            letter-spacing: 1px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
             color: var(--gray);
-            position: relative;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: left;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .tab-btn.active {
-            color: var(--primary);
-            background: white;
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: var(--white);
         }
 
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .nav-item.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(67, 24, 255, 0.4);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-header {
+            background: var(--white);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        .top-header h2 {
+            font-size: 1.5em;
+            color: var(--dark);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        .add-section {
-            padding: 30px;
-            background: var(--light-bg);
-            border-bottom: 1px solid #e1e5e9;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        /* --- CARDS & SECTIONS --- */
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            margin-bottom: 25px;
+        }
+
+        /* --- FORMS --- */
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             align-items: end;
-            max-width: 900px;
-            margin: 0 auto;
         }
 
         .form-group {
@@ -135,84 +180,38 @@
 
         .form-group label {
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--dark);
-            font-size: 0.9em;
+            font-size: 0.85em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .form-group input {
             padding: 14px 18px;
-            border: 2px solid #e1e5e9;
+            border: 2px solid #E2E8F0;
             border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #F8FAFC;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1);
         }
 
-        .dropdown-container {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid #e1e5e9;
-            border-top: none;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 100;
-        }
-
-        .dropdown-container.show {
-            max-height: 300px;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .dropdown-item {
-            padding: 14px 18px;
-            cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
-            transition: all 0.2s ease;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .dropdown-item:hover,
-        .dropdown-item.selected {
-            background: linear-gradient(135deg, rgba(79, 172, 254, 0.08), rgba(0, 242, 254, 0.08));
-            color: var(--primary);
-            padding-left: 24px;
-            transform: translateX(4px);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-        }
-
+        /* --- BUTTONS --- */
         .btn {
             padding: 14px 24px;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -220,264 +219,231 @@
             color: white;
         }
 
-        .add-btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            height: 52px;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        .add-btn { background: var(--primary); }
+        .add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(67, 24, 255, 0.3); }
+        .add-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        .cancel-btn { background: #E2E8F0; color: var(--dark); display: none; }
+        .cancel-btn.visible { display: inline-flex; }
+        .cancel-btn:hover { background: #CBD5E1; }
+
+        .btn-secondary { background: var(--secondary); }
+        .btn-success { background: var(--success); }
+        .btn-dark { background: var(--dark); }
+        .btn-danger { background: var(--danger); }
+        .btn-warning { background: var(--warning); color: var(--dark); }
+
+        /* --- DROPDOWN --- */
+        .dropdown-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
         }
 
-        .add-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        .dropdown-container.show {
+            max-height: 250px;
+            opacity: 1;
+            overflow-y: auto;
         }
 
-        .add-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .dropdown-item {
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #F8FAFC;
+            transition: all 0.2s ease;
         }
 
-        .cancel-btn {
-            background: #e1e5e9;
-            color: var(--dark);
-            height: 52px;
-            display: none;
+        .dropdown-item:hover, .dropdown-item.selected {
+            background: #F4F7FE;
+            color: var(--primary);
+            padding-left: 24px;
         }
 
-        .cancel-btn:hover {
-            background: #d1d5d9;
-        }
-
-        .cancel-btn.visible {
-            display: inline-flex;
-        }
-
-        .logs-section, .summary-section {
-           display: flex;
-    flex-direction: column;
-    gap: 30px;
-    padding: 30px;
-}
-
-        .logs-header {
+        /* --- STATS CARDS --- */
+        .stats-container {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .stats {
-            display: flex;
             gap: 20px;
             flex-wrap: wrap;
+            margin-bottom: 25px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex: 1;
+            min-width: 200px;
+            padding: 25px;
+            border-radius: 20px;
             color: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-card div {
-            font-size: 1.5em;
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: 800;
             line-height: 1;
-            margin-bottom: 5px;
+            z-index: 1;
         }
 
-        .controls-wrapper {
+        .stat-card .label {
+            font-size: 0.9em;
+            font-weight: 600;
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        /* --- LOG ITEMS --- */
+        .log-item {
+            background: var(--white);
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            align-items: flex-end;
-        }
-
-        .filter-group input {
-            padding: 12px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            width: 350px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .filter-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
-        }
-
-        .global-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .global-btn {
-            padding: 10px 16px;
-            font-size: 14px;
-            border-radius: 8px;
-        }
-
-        .btn-copy-all { background: var(--dark); }
-        .btn-export { background: var(--success); }
-        .btn-clear-all { background: var(--danger); }
-
-        .logs, ..summary-table-container {
-    max-height: none !important;
-    overflow: visible !important;
-}
-
-        .logs::-webkit-scrollbar,
-        .summary-table-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .logs::-webkit-scrollbar-track,
-        .summary-table-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .logs::-webkit-scrollbar-thumb,
-        .summary-table-container::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        .log-item {
-            background: white;
-            border: 2px solid #f0f2f5;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
         }
 
         .log-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(67, 24, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .log-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
+            align-items: center;
         }
 
-        .item-name {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .quantity {
-            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
-            color: white;
-            padding: 8px 16px;
+        .item-name { font-size: 1.2em; font-weight: 800; color: var(--dark); }
+        .quantity-badge {
+            background: rgba(1, 181, 116, 0.1);
+            color: var(--success);
+            padding: 6px 14px;
             border-radius: 20px;
-            font-weight: 700;
-            font-size: 1.1em;
+            font-weight: 800;
+            font-size: 1em;
         }
 
-        .log-meta {
-            display: flex;
-            gap: 20px;
-            font-size: 0.9em;
-            color: var(--gray);
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
+        .log-meta { display: flex; gap: 20px; font-size: 0.85em; color: var(--gray); font-weight: 600; }
+        
         .action-buttons {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: flex-end;
-            border-top: 1px solid #f0f2f5;
             padding-top: 15px;
+            border-top: 1px dashed #E2E8F0;
         }
 
         .action-btn {
-            padding: 8px 14px;
+            padding: 8px 16px;
             border: none;
             border-radius: 8px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
+        .edit-btn { background: #F4F7FE; color: var(--primary); }
+        .edit-btn:hover { background: var(--primary); color: white; }
+        .delete-btn { background: #FFF5F5; color: var(--danger); }
+        .delete-btn:hover { background: var(--danger); color: white; }
 
-        .edit-btn { 
-            background: var(--primary); 
-            color: white;
+        /* --- TABLES --- */
+        .table-container {
+            overflow-x: auto;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            border: 1px solid #E2E8F0;
         }
 
-        .delete-btn { 
-            background: #ecf0f1; 
-            color: var(--danger); 
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-      .summary-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-     .summary-table th {
-    padding: 18px 20px;
-    font-size: 18px; /* Increased from 14px */
-    font-weight: 800; /* Extra Bold */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background-color: #f8f9ff;
-}
-
-.summary-table td {
-    padding: 12px 15px; /* Increased padding for better spacing */
-    font-size: 16px;    /* Increased from 12px */
-    font-weight: 700;    /* Bold */
-    border-bottom: 1px solid #f0f0f0;
-}
-.item-group-header td {
-    padding-top: 15px !important;
-    padding-bottom: 10px !important;
-    font-size: 18px; /* Larger category names */
-    background-color: #fcfdfe !important;
-    border-bottom: 2px solid var(--primary) !important;
-    color: var(--dark);
-}
-.item-group-total td {
-    font-size: 17px;
-    padding-top: 10px !important;
-    padding-bottom: 20px !important;
-}
-        .summary-table tr:hover {
-            background: rgba(79, 172, 254, 0.05);
-        }
-
-        .summary-table .total-qty {
-            font-weight: 700;
-            font-size: 16px;
-            color: var(--success);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
+        .data-table th {
+            background: #F8FAFC;
+            padding: 18px 20px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             color: var(--gray);
+            border-bottom: 2px solid #E2E8F0;
+            text-align: left;
         }
+
+        .data-table td {
+            padding: 15px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #F1F5F9;
+            color: var(--dark);
+        }
+
+        .data-table tr:hover { background: #F8FAFC; }
+        
+        .item-group-header td {
+            background: #F4F7FE !important;
+            font-size: 16px;
+            color: var(--primary);
+            padding-top: 20px;
+        }
+        
+        .item-group-total td {
+            background: #FFFFFF;
+            font-weight: 800;
+            border-bottom: 3px solid #E2E8F0 !important;
+        }
+
+        /* --- UTILS --- */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            padding: 12px 20px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            width: 300px;
+            font-size: 15px;
+            background: var(--white);
+        }
+        .search-bar:focus { outline: none; border-color: var(--primary); }
 
         .toast {
             position: fixed;
@@ -487,768 +453,651 @@
             color: white;
             padding: 16px 28px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             transform: translateY(100px);
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
             font-weight: 600;
-            max-width: 400px;
-            word-wrap: break-word;
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        .toast.show { transform: translateY(0); opacity: 1; }
 
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
+        .litepicker { z-index: 9999 !important; }
 
-        /* NEW STYLE FOR BLANK STICKERS */
-        .blank-sticker-card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            border: 2px solid #e1e5e9;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .blank-sticker-grid {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .blank-btn-group {
-            display: flex;
-            gap: 10px;
-            flex: 2;
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .form-grid { 
-                grid-template-columns: 1fr; 
-                gap: 15px;
+        /* --- RESPONSIVE --- */
+        @media (max-width: 900px) {
+            .app-layout { flex-direction: column; }
+            .sidebar { 
+                width: 100%; 
+                height: auto; 
+                flex-direction: row; 
+                align-items: center;
+                padding: 10px;
+                overflow-x: auto;
             }
-            .logs-header { 
-                flex-direction: column; 
-                align-items: stretch; 
-            }
-            .controls-wrapper { 
-                align-items: stretch; 
-            }
-            .filter-group input {
-                width: 100%;
-            }
-            .global-actions {
-                justify-content: center;
-            }
-            .summary-table { font-size: 13px; }
-            .summary-table th, .summary-table td { 
-                padding: 12px 10px; 
-            }
-            .log-header {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-            .blank-sticker-grid {
-                flex-direction: column;
-                align-items: stretch;
-            }
+            .sidebar-header { border-bottom: none; border-right: 1px solid rgba(255,255,255,0.1); margin: 0 10px 0 0; padding: 10px; }
+            .sidebar-header h1 { font-size: 1.2em; }
+            .nav-menu { flex-direction: row; }
+            .nav-item { white-space: nowrap; padding: 10px 15px; }
+            .top-header { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .content-area { padding: 15px; }
+            .controls-row { flex-direction: column; align-items: stretch; }
+            .search-bar { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📄 Hold Sticker Logs</h1>
-        </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="logs">📋 Hold Logs</button>
-            <button class="tab-btn" data-tab="blankStock">⚪ Blank Sticker Stock</button>
-            <button class="tab-btn" data-tab="summary">📊 Inventory Summary</button>
-        </div>
-
-        <div id="logsTab" class="tab-content active">
-            <div class="add-section">
-                <form id="auditForm" class="form-grid">
-                    <div class="form-group">
-                        <label for="itemName">Item Name</label>
-                        <input type="text" id="itemName" placeholder="e.g., MINI FLASHLIGHT" autocomplete="off">
-                        <div class="dropdown-container" id="dropdownContainer"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" min="1" placeholder="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn add-btn" id="submitBtn">➕ Add Log</button>
-                       <button type="button" class="btn cancel-btn" id="cancelBtn" onclick="cancelEdit()">✖ Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="logs-section">
-                <div class="logs-header">
-                    <div class="stats">
-                        <div class="stat-card">
-                            <div id="totalItems">0</div>
-                            <small>Total Logs</small>
-                        </div>
-                        <div class="stat-card">
-                            <div id="totalQuantity">0</div>
-                            <small>Total Quantity</small>
-                        </div>
-                        
-                    </div>
-                    
-                    <div class="controls-wrapper">
-                        <div class="filter-group">
-                            <input type="text" id="searchInput" placeholder="🔍 Search items by name...">
-                        </div>
-                       <div class="global-actions">
-    <button class="btn global-btn btn-copy-all" onclick="copyAllLogs()">📋 Copy All</button>
-    <button class="btn global-btn" onclick="loadData()" style="background: var(--primary);">🔄 Refresh Logs</button>
+<div class="app-layout">
     
-    <button class="btn global-btn" onclick="triggerManualUpload()" style="background: #e67e22; border: 1px solid #d35400;">📤 Upload to Sheet</button>
-</div>
-                    </div>
-                </div>
-                
-                <div class="logs" id="logsContainer">
-                    <div class="empty-state">
-                        <h3>🚀 Get Started</h3>
-                        <p>Add your first inventory audit log using the form above!</p>
-                    </div>
-                </div>
-            </div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>📦 HoldStocker</h1>
         </div>
+        <nav class="nav-menu">
+            <button class="nav-item active" data-tab="logs" onclick="switchTab('logs', 'Hold Logs')">
+                📋 Hold Logs
+            </button>
+            <button class="nav-item" data-tab="blankStock" onclick="switchTab('blankStock', 'Blank Stock Management')">
+                ⚪ Blank Stock
+            </button>
+            <button class="nav-item" data-tab="summary" onclick="switchTab('summary', 'Inventory Summary')">
+                📊 Summary
+            </button>
+            <button class="nav-item" data-tab="newProduct" onclick="switchTab('newProduct', 'Add New Product')">
+                🛍️ New Product
+            </button>
+        </nav>
+    </aside>
 
-<div id="summaryTab" class="tab-content">
-    <div class="summary-section">
-    <div class="stats" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
-        <div class="stat-card" style="background: var(--dark); flex: 1; min-width: 250px;">
-            <div id="totalBlankStickers">0</div>
-            <small>Sticker With Number Stocks</small>
-        </div>
-        <div class="stat-card" style="background: var(--primary); flex: 1; min-width: 250px;">
-            <div id="totalBlankNoNums">0</div>
-            <small>Stock Without Numbers</small>
-        </div>
-        <div class="stat-card" style="background: #f39c12; flex: 1; min-width: 250px;">
-            <div id="summaryTotalQty">0</div>
-            <small>Total Hold Quantity</small>
-        </div>
-    </div>
-
-    <h3 style="margin-bottom: 15px; color: var(--dark);">📦 Stock Breakdown</h3>
-    <div class="summary-table-container" style="margin-bottom: 40px;">
-        <table class="summary-table">
-            <thead>
-                <tr>
-                    <th>Sticker Type / Category</th>
-                    <th style="text-align: right;">Current Count</th>
-                </tr>
-            </thead>
-            <tbody id="stockBreakdownBody">
-                </tbody>
-        </table>
-    </div>
-    
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 15px; flex-wrap: wrap; background: #f8f9ff; padding: 15px; border-radius: 12px;">
-    <h3 style="margin: 0; color: var(--dark);">📋 Item Logs Summary</h3>
-    
-    <div style="display: flex; gap: 10px; align-items: center; flex-grow: 1; max-width: 550px;">
-        <div style="position: relative; flex-grow: 1;">
-            <input type="text" id="summaryRangePicker" placeholder="📅 Select Date Range (Click to drag/select)" 
-                   style="width: 100%; padding: 10px 15px; border-radius: 8px; border: 2px solid #4facfe; font-size: 14px; cursor: pointer; background: white;">
-        </div>
-
-        <button class="btn add-btn" onclick="copyTableAsImage()" 
-                style="height: 42px; padding: 0 20px; font-size: 14px; background: var(--dark); white-space: nowrap;">
-            📋 Copy as Image
-        </button>
-    </div>
-</div>
-    <div class="summary-table-container">
-        <table class="summary-table" id="summaryTable">
-            <thead>
-                <tr>
-                    <th>Item Name</th>
-                    <th style="text-align: right;">Total Quantity</th>
-                </tr>
-            </thead>
-            <tbody id="summaryTableBody">
-                </tbody>
-        </table>
-    </div>
-</div>
-    </div>
-<div id="blankStockTab" class="tab-content">
-    <div class="summary-section" style="background: white; margin: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 40px;">
+    <main class="main-wrapper">
         
-        <h2 style="margin-bottom: 25px; color: var(--dark); border-bottom: 2px solid var(--light-bg); padding-bottom: 15px;">
-            📦 Stock Management
-        </h2>
+        <header class="top-header">
+            <h2 id="pageTitle">Hold Logs</h2>
+            <div class="global-actions">
+                <button class="btn btn-dark" onclick="copyAllLogs()">📋 Copy Logs</button>
+                <button class="btn btn-warning" onclick="triggerManualUpload()">📤 Upload to Sheet</button>
+                <button class="btn btn-secondary" onclick="loadData()">🔄 Refresh</button>
+            </div>
+        </header>
 
-        <div class="blank-sticker-card">
-            <h3 style="margin-bottom: 15px; color: var(--dark); display: flex; align-items: center; gap: 10px;">
-                ⚪ Blank Stickers (With Numbers)
-            </h3>
-            <div class="blank-sticker-grid">
-                <div class="stat-card" style="background: var(--dark); flex: 1; min-width: 200px;">
-                    <div id="totalBlankStickers">0</div>
-                    <small>Stock With Numbers</small>
+        <div class="content-area">
+            
+            <div id="logsTab" class="tab-content active">
+                
+                <div class="card">
+                    <form id="auditForm" class="form-grid">
+                        <div class="form-group">
+                            <label for="itemName">Item Name</label>
+                            <input type="text" id="itemName" placeholder="e.g., MINI FLASHLIGHT" autocomplete="off">
+                            <div class="dropdown-container" id="dropdownContainer"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" min="1" placeholder="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: row; gap: 10px;">
+                            <button type="submit" class="btn add-btn" id="submitBtn" style="flex:1;">➕ Add Log</button>
+                            <button type="button" class="btn cancel-btn" id="cancelBtn" onclick="cancelEdit()">✖</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="blank-btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                  <button class="btn add-btn" onclick="modifyBlankStickers(200, 'with')" style="background: var(--primary);">+200</button>
-                    <button class="btn add-btn" onclick="modifyBlankStickers(1000, 'with')" style="background: #8e44ad;">📦 1 Bundle (1k)</button>
-                    
-                    
-                    <span style="margin: 0 10px; color: var(--gray);">|</span>
-                    <input type="number" id="manualBlankWith" placeholder="Qty" style="width: 80px; padding: 10px; border-radius: 12px; border: 2px solid var(--danger);">
-                    <button class="btn add-btn" onclick="handleDeduction('with')" style="background: var(--danger);">➖ Deduct</button>
+
+                <div class="stats-container">
+                    <div class="stat-card" style="background: var(--dark);">
+                        <div class="value" id="totalItems">0</div>
+                        <div class="label">Total Log Entries</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--primary);">
+                        <div class="value" id="totalQuantity">0</div>
+                        <div class="label">Total Item Quantity</div>
+                    </div>
+                </div>
+
+                <div class="controls-row">
+                    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search items by name...">
+                </div>
+
+                <div id="logsContainer">
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <h3>🚀 Get Started</h3>
+                        <p>Add your first inventory audit log above.</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="blank-sticker-card" style="border-color: var(--primary);">
-            <h3 style="margin-bottom: 15px; color: var(--dark); display: flex; align-items: center; gap: 10px;">
-                🔘 Blank Stickers (Without Numbers)
-            </h3>
-            <div class="blank-sticker-grid">
-                <div class="stat-card" style="background: var(--primary); flex: 1; min-width: 200px;">
-                    <div id="totalBlankNoNums">0</div>
-                    <small>Stock Without Numbers</small>
+            <div id="blankStockTab" class="tab-content">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px; color: var(--dark);">⚪ Blank Stickers (With Numbers)</h3>
+                    <div class="stats-container" style="margin-bottom: 20px;">
+                        <div class="stat-card" style="background: var(--dark); flex: 0.5;">
+                            <div class="value" id="totalBlankStickers">0</div>
+                            <div class="label">Stock With Numbers</div>
+                        </div>
+                        <div style="flex: 1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" onclick="modifyBlankStickers(200, 'with')">+200</button>
+                            <button class="btn" style="background:#8e44ad;" onclick="modifyBlankStickers(1000, 'with')">📦 1 Bundle (1k)</button>
+                            <div style="display: flex; gap: 10px; align-items: center; margin-left: auto;">
+                                <input type="number" id="manualBlankWith" placeholder="Qty" style="width: 100px; padding: 12px; border-radius: 10px; border: 2px solid var(--danger);">
+                                <button class="btn btn-danger" onclick="handleDeduction('with')">➖ Deduct</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="blank-btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <button class="btn add-btn" onclick="modifyBlankStickers(1000, 'without')" style="background: var(--success);">+1000</button>
-                    <button class="btn add-btn" onclick="modifyBlankStickers(12000, 'without')" style="background: var(--dark);">+12000 📦 </button>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 20px; color: var(--dark);">🔘 Blank Stickers (Without Numbers)</h3>
+                    <div class="stats-container">
+                        <div class="stat-card" style="background: var(--primary); flex: 0.5;">
+                            <div class="value" id="totalBlankNoNums">0</div>
+                            <div class="label">Stock Without Numbers</div>
+                        </div>
+                        <div style="flex: 1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn btn-success" onclick="modifyBlankStickers(1000, 'without')">+1000</button>
+                            <button class="btn btn-dark" onclick="modifyBlankStickers(12000, 'without')">+12000 📦</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div id="summaryTab" class="tab-content">
+                <div class="stats-container">
+                    <div class="stat-card" style="background: var(--dark);">
+                        <div class="value" id="sumBlankStickers">0</div>
+                        <div class="label">Stickers With Numbers</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--primary);">
+                        <div class="value" id="sumBlankNoNums">0</div>
+                        <div class="label">Stickers Without Numbers</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--warning); color: var(--dark);">
+                        <div class="value" id="summaryTotalQty">0</div>
+                        <div class="label">Total Hold Quantity</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 15px;">📦 Stock Breakdown</h3>
+                    <div class="table-container" style="margin-bottom: 30px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Sticker Type / Category</th>
+                                    <th style="text-align: right;">Current Count</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stockBreakdownBody"></tbody>
+                        </table>
+                    </div>
+
+                   <div class="controls-row" style="background: #F8FAFC; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+    <h3 style="margin: 0;">📋 Item Logs Summary</h3>
+    
+   <div style="display: flex; gap: 10px; align-items: center; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #E2E8F0; position: relative;">
+    <div style="position: relative; flex: 1;">
+        <input type="text" id="deductItemName" placeholder="Search product to deduct..." 
+               class="search-bar" style="width: 100%; margin-bottom:0;" 
+               oninput="manageDeductDropdown(this.value)" 
+               onfocus="manageDeductDropdown(this.value)"
+               autocomplete="off">
+        <div id="deductDropdown" class="dropdown-container" style="top: 100%; left: 0; right: 0;"></div>
     </div>
+    <input type="number" id="deductQty" placeholder="Qty" class="search-bar" style="width: 80px; margin-bottom:0;">
+    <button class="btn btn-danger" onclick="applyDeduction()" style="padding: 10px 15px;">➖ Deduct</button>
 </div>
 
-    <div id="toast" class="toast"></div>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="summaryRangePicker" placeholder="📅 Filter Date Range" class="search-bar" style="width: 250px;">
+        <button class="btn btn-dark" onclick="copyTableAsImage()">📷 Copy as Image</button>
+    </div>
+</div>
+                    
+                    <div class="table-container" id="summaryTableWrapper">
+                        <table class="data-table" id="summaryTable">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th style="text-align: right;">Total Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    <script>
-        let auditLogs = [];
-        let inventorySummary = [];
-        let blankStickersCount = 0; // New state variable
-        let blankStickersNoNumsCount = 0;
-        let editingLogId = null;
-        let currentTab = 'logs';
-        let dropdownTimeout;
-        let selectedIndex = -1;
+           <div id="newProductTab" class="tab-content">
+    <div class="card">
+        <h3 style="margin-bottom: 20px; color: var(--dark);">🛍️ Add New Product Category</h3>
+        <p style="color: var(--gray); margin-bottom: 25px;">Define new items here to make them available in the Hold Logs dropdown.</p>
+        
+        <form id="newProductForm" class="form-grid" style="grid-template-columns: 1fr 2fr auto;" onsubmit="handleNewProductSubmit(event)">
+            <div class="form-group">
+                <label for="newProdMultiplier">Multiplier</label>
+                <select id="newProdMultiplier" style="padding: 14px 18px; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 15px; background: #F8FAFC;">
+                    <option value="1 x">1 x</option>
+                    <option value="2 x">2 x</option>
+                    <option value="3 x">3 x</option>
+                    <option value="4 x">4 x</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="newProdName">Product Name</label>
+                <input type="text" id="newProdName" placeholder="e.g., TACTICAL FLASHLIGHT" oninput="this.value = this.value.toUpperCase()" required>
+            </div>
+            <div class="form-group" style="justify-content: flex-end;">
+                <button type="submit" class="btn add-btn">💾 Save Product</button>
+            </div>
+        </form>
+    </div>
 
-        const initialItems = [
-            "1 x MINI FLASHLIGHT","2 x MINI FLASHLIGHT", "2 x FLASHLIGHT", "1 x SEAT COVER", "1 x MOTORCYCLE GLOVES", "1 x DOOR & WINDOW ALARM",
-            "1 x CAMERA SHUTTER REMOTE", "1 x FULLFACE BLACKLAVA", "1 x MOLDABLE FALSE TEETH","1 x KNEE PAIN RELIEVER","1 x MINI ROTATABLE SOCKET","1 x SPONGE DRAINER",
-            "1 x HANDS FREE FEEDING BOTTLE", "1 x MINI USB FAN", "1 x MAGIC MESH","1 x LED EAR CLEANER","1 x MOTOR SWITCH EXTENSION","1 x UV ARM SLEEVE","1 x COOKWARE CLEANING PASTE",
-            "1 x HELMET CARGO NET", "1 x PANTY STOCKINGS","4 x LEVER COVER","1 x BABY SILICON FEEDER","1 x MAGIC COMB","1 x CAR PAINT REPAIR",
-            "2 x SHOE CLEANER", "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x ANTI PULGAS","1 x WAISTBAND SHAPER","2 x DISPOSABLE TOILET SEATCOVER","1 x PORTABLE CLOTHESLINE WITH CLIP",
-            "1 x RUBBER COATING SPRAY", "1 x NOSE SHAPER", "1 x MOTORCYCLE BOLT CUP","1 x FACE SHAPER","1 x LASER FLASHLIGHT","2 x MAGIC TOWEL","1 x CUP CLEANER","1 x GAS TREATMENT","1 x HELMET HOOK","1 x MULTI PURPOSE SAFETY LOCK","1 x ANTI MITES"
-        ];
+        </div>
+    </main>
+</div>
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            setDateToday();
-            initEventListeners();
-            loadData();
+<div id="toast" class="toast"></div>
+
+<script>
+    // --- STATE ---
+    let auditLogs = [];
+    let inventorySummary = [];
+    let blankStickersCount = 0; 
+    let blankStickersNoNumsCount = 0;
+    let editingLogId = null;
+    let dropdownTimeout;
+    let selectedIndex = -1;
+
+    let initialItems = [
+        "1 x MINI FLASHLIGHT","2 x MINI FLASHLIGHT", "2 x FLASHLIGHT", "1 x SEAT COVER", "1 x MOTORCYCLE GLOVES",
+        "1 x CAMERA SHUTTER REMOTE", "1 x FULLFACE BLACKLAVA", "1 x MOLDABLE FALSE TEETH","1 x KNEE PAIN RELIEVER",
+        "1 x MINI ROTATABLE SOCKET","1 x SPONGE DRAINER", "1 x HANDS FREE FEEDING BOTTLE", "1 x MINI USB FAN", 
+        "1 x MAGIC MESH","1 x LED EAR CLEANER","1 x MOTOR SWITCH EXTENSION","1 x UV ARM SLEEVE","1 x COOKWARE CLEANING PASTE",
+        "1 x HELMET CARGO NET", "1 x PANTY STOCKINGS","4 x LEVER COVER","1 x BABY SILICON FEEDER","1 x MAGIC COMB",
+        "1 x CAR PAINT REPAIR", "2 x SHOE CLEANER", "1 x FLEXIBLE CLIP PHONE HOLDER", "2 x ANTI PULGAS",
+        "1 x WAISTBAND SHAPER","2 x DISPOSABLE TOILET SEATCOVER","1 x PORTABLE CLOTHESLINE WITH CLIP",
+        "1 x RUBBER COATING SPRAY", "1 x NOSE SHAPER", "1 x MOTORCYCLE BOLT CUP","1 x FACE SHAPER",
+        "1 x LASER FLASHLIGHT","2 x MAGIC TOWEL","1 x CUP CLEANER","1 x GAS TREATMENT","1 x HELMET HOOK",
+        "1 x MULTI PURPOSE SAFETY LOCK","1 x ANTI MITES"
+    ];
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', function() {
+        setDateToday();
+        initEventListeners();
+        loadData();
+    });
+
+    function setDateToday() {
+        document.getElementById('date').valueAsDate = new Date();
+    }
+
+    // --- NAVIGATION LOGIC ---
+    async function switchTab(tabId, title) {
+        // Update Title
+        document.getElementById('pageTitle').textContent = title;
+
+        // Update Nav Buttons
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tabId);
+        });
+        
+        // Update Content visibility
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === tabId + 'Tab');
         });
 
-        function setDateToday() {
-            const today = new Date();
-            document.getElementById('date').valueAsDate = today;
+        // Fetch data if summary
+        if (tabId === 'summary') {
+            await loadData();
         }
-
-        function initEventListeners() {
-            document.getElementById('auditForm').addEventListener('submit', handleFormSubmit);
-            document.getElementById('searchInput').addEventListener('input', function() {
-                renderLogs(this.value);
-            });
-            const itemNameInput = document.getElementById('itemName');
-            itemNameInput.addEventListener('input', handleItemNameInput);
-            itemNameInput.addEventListener('keydown', handleItemNameKeydown);
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.form-group:has(#itemName)')) {
-                    closeDropdown();
-                }
-            });
-        }
-
-        // Google Sheets API calls
-        async function callGoogleScript(functionName, parameters = {}) {
-            try {
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbymKAcS0I7nYrrh6Nnr_uWDyylhIWhU-BiqIgiLXCOmCl5ejAwaHECt_HhFAcoJ_CjHoA/exec';
-                const container = document.querySelector('.container');
-                container.classList.add('loading');
-                
-                const response = await fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'cors',  
-                    redirect: 'follow', 
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', 
-                    },
-                    body: JSON.stringify({ functionName, parameters })
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const result = await response.json();
-                return result.success !== false ? (result.data || result) : { success: false, message: result.message };
-            } catch (error) {
-                console.error('Google Script Error:', error);
-                showToast('❌ Connection failed: ' + error.message);
-                return { success: false, message: error.message };
-            } finally {
-                document.querySelector('.container').classList.remove('loading');
-            }
-        }
-
-async function loadData() {
-    showToast('🔄 Loading data...');
-    try {
-        const logsResult = await callGoogleScript('getAllLogs');
-        
-        // Improved check: Ensure we actually got an array back
-        if (logsResult && Array.isArray(logsResult)) {
-            auditLogs = logsResult;
-            renderLogs(); 
-        } else if (logsResult && logsResult.data && Array.isArray(logsResult.data)) {
-            auditLogs = logsResult.data;
-            renderLogs();
-        } else {
-            console.error("Format error:", logsResult);
-            showToast('⚠️ Logs format is incorrect');
-        }
-
-        const summaryResult = await callGoogleScript('getInventorySummary');
-        if (summaryResult) {
-            inventorySummary = Array.isArray(summaryResult) ? summaryResult : (summaryResult.data || []);
-            renderSummary();
-            updateBlankDisplay(); 
-        }
-
-        const blankResult = await callGoogleScript('getBlankStickerCount');
-        if (blankResult) {
-            blankStickersCount = parseInt(blankResult.withNumbers) || 0;
-            blankStickersNoNumsCount = parseInt(blankResult.withoutNumbers) || 0;
-            updateBlankDisplay();
-        }
-
-        // --- ADDED SUCCESS NOTIFICATION HERE ---
-        showToast('✅ Data updated successfully!');
-        
-    } catch (error) { 
-        console.error("Load Data Error:", error);
-        showToast('❌ Failed to load logs');
     }
-}
 
-        // Blank Sticker Logic
-async function modifyBlankStickers(amount, type) {
-            showToast(`⏳ Updating stock...`);
-
-            // NEW LOGIC: If adding to "With Numbers" (> 0), deduct from "Without Numbers" pool
-            if (type === 'with' && amount > 0) {
-                blankStickersCount += amount;
-                blankStickersNoNumsCount -= amount; // Deduct the converted amount
-
-                // Make two separate calls since we are updating both pools in the sheet
-                const resWith = await callGoogleScript('updateBlankStickers', { 
-                    newTotal: blankStickersCount, 
-                    type: 'with' 
-                });
-                
-                const resWithout = await callGoogleScript('updateBlankStickers', { 
-                    newTotal: blankStickersNoNumsCount, 
-                    type: 'without' 
-                });
-
-                if (resWith.success && resWithout.success) {
-                    updateBlankDisplay();
-                    showToast(`✅ Converted ${amount} stickers! Stock updated.`);
-                } else {
-                    showToast('❌ Error updating stock in Sheet');
-                }
-                return; // Exit early so we don't run the default logic below
+    // --- CORE LOGIC (Preserved from Original) ---
+    function initEventListeners() {
+        document.getElementById('auditForm').addEventListener('submit', handleFormSubmit);
+        document.getElementById('searchInput').addEventListener('input', function() { renderLogs(this.value); });
+        
+        const itemNameInput = document.getElementById('itemName');
+        itemNameInput.addEventListener('input', handleItemNameInput);
+        itemNameInput.addEventListener('keydown', handleItemNameKeydown);
+        
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.form-group:has(#itemName)')) {
+                closeDropdown();
             }
+        });
+    }
 
-            // DEFAULT LOGIC: For manual deductions (-) or adding to "Without Numbers"
-            let newTotal;
-            if (type === 'without') {
-                blankStickersNoNumsCount += amount;
-                newTotal = blankStickersNoNumsCount;
-            } else {
-                blankStickersCount += amount;
-                newTotal = blankStickersCount;
-            }
-
-            // Call the script with the 'type' parameter included
-            const result = await callGoogleScript('updateBlankStickers', { 
-                newTotal: newTotal, 
-                type: type 
+    async function callGoogleScript(functionName, parameters = {}) {
+        try {
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbymKAcS0I7nYrrh6Nnr_uWDyylhIWhU-BiqIgiLXCOmCl5ejAwaHECt_HhFAcoJ_CjHoA/exec';
+            document.body.style.cursor = 'wait';
+            
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'cors',  
+                redirect: 'follow', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ functionName, parameters })
             });
 
-            if (result.success) {
-                updateBlankDisplay();
-                showToast('✅ Stock updated in Sheet');
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const result = await response.json();
+            return result.success !== false ? (result.data || result) : { success: false, message: result.message };
+        } catch (error) {
+            console.error('Google Script Error:', error);
+            showToast('❌ Connection failed: ' + error.message);
+            return { success: false, message: error.message };
+        } finally {
+            document.body.style.cursor = 'default';
         }
+    }
+
+    async function loadData() {
+        showToast('🔄 Loading data...');
+        try {
+            const logsResult = await callGoogleScript('getAllLogs');
+            if (logsResult && Array.isArray(logsResult)) auditLogs = logsResult;
+            else if (logsResult && logsResult.data && Array.isArray(logsResult.data)) auditLogs = logsResult.data;
+            
+            renderLogs();
+
+            const summaryResult = await callGoogleScript('getInventorySummary');
+            if (summaryResult) inventorySummary = Array.isArray(summaryResult) ? summaryResult : (summaryResult.data || []);
+
+            const blankResult = await callGoogleScript('getBlankStickerCount');
+            if (blankResult) {
+                blankStickersCount = parseInt(blankResult.withNumbers) || 0;
+                blankStickersNoNumsCount = parseInt(blankResult.withoutNumbers) || 0;
+            }
+            
+            updateBlankDisplay();
+            renderSummary();
+            showToast('✅ Data updated!');
+        } catch (error) { 
+            showToast('❌ Failed to load logs');
+        }
+    }
+
+    async function modifyBlankStickers(amount, type) {
+        showToast(`⏳ Updating stock...`);
+        if (type === 'with' && amount > 0) {
+            blankStickersCount += amount;
+            blankStickersNoNumsCount -= amount;
+            const resWith = await callGoogleScript('updateBlankStickers', { newTotal: blankStickersCount, type: 'with' });
+            const resWithout = await callGoogleScript('updateBlankStickers', { newTotal: blankStickersNoNumsCount, type: 'without' });
+
+            if (resWith.success && resWithout.success) {
+                updateBlankDisplay();
+                showToast(`✅ Converted ${amount} stickers!`);
+            } else showToast('❌ Error updating stock');
+            return; 
+        }
+
+        let newTotal;
+        if (type === 'without') { blankStickersNoNumsCount += amount; newTotal = blankStickersNoNumsCount; } 
+        else { blankStickersCount += amount; newTotal = blankStickersCount; }
+
+        const result = await callGoogleScript('updateBlankStickers', { newTotal: newTotal, type: type });
+        if (result.success) { updateBlankDisplay(); showToast('✅ Stock updated'); }
+    }
 
     function updateBlankDisplay() {
-    // 1. Update "With Numbers" displays
-    document.querySelectorAll('#totalBlankStickers').forEach(el => {
-        el.textContent = blankStickersCount.toLocaleString();
-    });
-
-    // 2. Update "Without Numbers" displays
-    document.querySelectorAll('#totalBlankNoNums').forEach(el => {
-        el.textContent = blankStickersNoNumsCount.toLocaleString();
-    });
-    
-    // 3. Update the Total Hold card (Sum of all item logs)
-    const totalHoldEl = document.getElementById('summaryTotalQty');
-    if (totalHoldEl) {
-        const logTotal = auditLogs.reduce((s, l) => s + (parseInt(l.quantity) || 0), 0);
-        totalHoldEl.textContent = logTotal.toLocaleString();
-    }
-}
-        // Tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
-        });
-
-        async function switchTab(tab) {
-    currentTab = tab;
-    
-    // Toggle active class on buttons
-    document.querySelectorAll('.tab-btn').forEach(b => 
-        b.classList.toggle('active', b.dataset.tab === tab)
-    );
-    
-    // Toggle active class on content sections
-    document.querySelectorAll('.tab-content').forEach(c => 
-        c.classList.toggle('active', c.id === tab + 'Tab')
-    );
-
-    // NEW: If switching to Summary, fetch the latest data from Google Sheets
-    if (tab === 'summary') {
-        await loadData(); // This calls your GS script and runs renderSummary()
-    }
-}
-
-        // Form handling
-async function handleFormSubmit(e) {
-    e.preventDefault();
-    const itemName = document.getElementById('itemName').value.trim();
-    const quantity = parseInt(document.getElementById('quantity').value);
-    const date = document.getElementById('date').value;
-
-    if (!itemName || !quantity || !date) return showToast('⚠️ Fill all fields');
-
-    const isEditing = editingLogId !== null;
-    const logData = { itemName, quantity, date };
-    if (isEditing) logData.id = editingLogId;
-
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    
-    // 1. Visual Notification
-    showToast(isEditing ? '⏳ Updating Log...' : '⏳ Adding Log...');
-    submitBtn.innerHTML = '⏳ Processing...';
-
-    // 2. Execute the Google Script
-    const result = await callGoogleScript(isEditing ? 'updateLog' : 'addLog', logData);
-    
-    // 3. UI Logic for Success
-    if (result.success || result) { 
-        showToast(isEditing ? '✅ Update Successful!' : '✅ Added Successfully!');
+        document.querySelectorAll('#totalBlankStickers, #sumBlankStickers').forEach(el => el.textContent = blankStickersCount.toLocaleString());
+        document.querySelectorAll('#totalBlankNoNums, #sumBlankNoNums').forEach(el => el.textContent = blankStickersNoNumsCount.toLocaleString());
         
-        // BACK TO "ADD LOG": This clears the editing ID and resets the button text
-        resetForm();
-        
-        // AUTO REFRESH: Fetch the new data from the sheet immediately
-        await loadData(); 
-        
-    } else {
-        showToast('❌ Save failed. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = isEditing ? '💾 Update Log' : '➕ Add Log';
-    }
-}
-
-function resetForm() {
-    editingLogId = null; // Important: clears the "Edit" state
-    document.getElementById('itemName').value = '';
-    document.getElementById('quantity').value = '';
-    setDateToday();
-    
-    // Changes the button text back to the original Add state
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.innerHTML = '➕ Add Log';
-    submitBtn.disabled = false;
-    
-    document.getElementById('cancelBtn').classList.remove('visible');
-    closeDropdown();
-}
-
-        function cancelEdit() { resetForm(); showToast('↩️ Canceled edit'); }
-
-        // Dropdown & Search (simplified)
-        function handleItemNameInput(e) { manageDropdown(e.target.value); }
-        function handleItemNameKeydown(e) {
-            const items = document.querySelectorAll('.dropdown-item');
-            if (!items.length) return;
-            if (e.key === 'ArrowDown') { e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, items.length - 1); }
-            else if (e.key === 'ArrowUp') { e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); }
-            else if (e.key === 'Enter' && selectedIndex >= 0) { e.preventDefault(); selectDropdownItem(items[selectedIndex].dataset.item); }
-            updateDropdownSelection(items);
+        const totalHoldEl = document.getElementById('summaryTotalQty');
+        if (totalHoldEl) {
+            const logTotal = auditLogs.reduce((s, l) => s + (parseInt(l.quantity) || 0), 0);
+            totalHoldEl.textContent = logTotal.toLocaleString();
         }
-
-        function manageDropdown(inputValue) {
-            const container = document.getElementById('dropdownContainer');
-            if (!inputValue) return closeDropdown();
-            const filtered = initialItems.filter(i => i.toLowerCase().includes(inputValue.toLowerCase()));
-            if (!filtered.length) return closeDropdown();
-            container.innerHTML = filtered.map((item, i) => `<div class="dropdown-item" data-item="${item}" data-index="${i}">${item}</div>`).join('');
-            container.classList.add('show');
-            selectedIndex = -1;
-            document.querySelectorAll('.dropdown-item').forEach(el => el.onclick = () => selectDropdownItem(el.dataset.item));
-        }
-
-        function selectDropdownItem(name) { document.getElementById('itemName').value = name; closeDropdown(); }
-        function updateDropdownSelection(items) { items.forEach((it, i) => it.classList.toggle('selected', i === selectedIndex)); }
-        function closeDropdown() { document.getElementById('dropdownContainer').classList.remove('show'); }
-
-        // Rendering
-function renderLogs(filter = '') {
-    const container = document.getElementById('logsContainer');
-    // Ensure auditLogs is treated as an array
-    const logsToProcess = Array.isArray(auditLogs) ? auditLogs : [];
-    
-    const filtered = logsToProcess.filter(l => 
-        l.itemName && l.itemName.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    // Update Stats Cards
-    const totalQty = filtered.reduce((sum, log) => sum + (parseInt(log.quantity) || 0), 0);
-    document.getElementById('totalItems').textContent = filtered.length;
-    document.getElementById('totalQuantity').textContent = totalQty.toLocaleString();
-
-    if (!filtered.length) { 
-        container.innerHTML = '<div class="empty-state"><p>No logs found.</p></div>'; 
-        return; 
     }
 
-    container.innerHTML = filtered.map(log => `
-        <div class="log-item">
-            <div class="log-header">
-                <div class="item-name">${escapeHtml(log.itemName)}</div>
-                <div class="quantity">Qty: ${log.quantity.toLocaleString()}</div>
-            </div>
-            <div class="log-meta">
-                <span>📅 ${formatDate(log.date)}</span>
-                <span>#${log.id}</span>
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn edit-btn" onclick="editLog(${log.id})">✏️ Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteLog(${log.id})">🗑️ Delete</button>
-            </div>
-        </div>
-    `).join('');
-}
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const itemName = document.getElementById('itemName').value.trim();
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const date = document.getElementById('date').value;
 
-        function editLog(id) {
-            const log = auditLogs.find(l => l.id == id);
-            editingLogId = id;
-            document.getElementById('itemName').value = log.itemName;
-            document.getElementById('quantity').value = log.quantity;
-            document.getElementById('date').value = log.date;
-            document.getElementById('submitBtn').innerHTML = '💾 Update Log';
-            document.getElementById('cancelBtn').classList.add('visible');
-            document.querySelector('.add-section').scrollIntoView({ behavior: 'smooth' });
-        }
+        if (!itemName || !quantity || !date) return showToast('⚠️ Fill all fields');
 
-        async function deleteLog(id) {
-    // 1. Confirm with the user
-    if (!confirm('Are you sure you want to delete this log?')) return;
+        const isEditing = editingLogId !== null;
+        const logData = { itemName, quantity, date };
+        if (isEditing) logData.id = editingLogId;
 
-    try {
-        // 2. Visual feedback that the process started
-        showToast('⏳ Deleting log...');
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        showToast(isEditing ? '⏳ Updating Log...' : '⏳ Adding Log...');
+        submitBtn.innerHTML = '⏳ Processing...';
+
+        const result = await callGoogleScript(isEditing ? 'updateLog' : 'addLog', logData);
         
-        // 3. Execute the Google Script
-        const res = await callGoogleScript('deleteLog', { logId: id });
-
-        // 4. Handle result
-        if (res && res.success !== false) {
-            showToast('🗑️ Log deleted successfully!');
-            
-            // 5. Refresh the data to update the UI and stats
+        if (result.success || result) { 
+            showToast(isEditing ? '✅ Update Successful!' : '✅ Added Successfully!');
+            resetForm();
             await loadData(); 
         } else {
-            showToast('❌ Delete failed: ' + (res.message || 'Unknown error'));
+            showToast('❌ Save failed.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = isEditing ? '💾 Update Log' : '➕ Add Log';
         }
-    } catch (error) {
-        console.error('Delete Error:', error);
-        showToast('❌ Error connecting to server');
-    }
-}
-
-function renderSummary() {
-    const tbody = document.getElementById('summaryTableBody');
-    const stockBody = document.getElementById('stockBreakdownBody');
-    
-    // Safety check: Get dates from the Litepicker instance if it exists
-    const startDate = (typeof picker !== 'undefined' && picker) ? picker.getStartDate() : null;
-    const endDate = (typeof picker !== 'undefined' && picker) ? picker.getEndDate() : null;
-
-    // --- PART A: Render Stock Breakdown (Always visible) ---
-    const count200 = Math.floor(blankStickersCount / 200);
-    stockBody.innerHTML = `
-        <tr style="background: #f8f9ff; border-top: 2px solid #ddd;">
-            <td><strong>TOTAL WITHOUT NUMBERS</strong></td>
-            <td style="text-align: right; font-weight: 800; color: var(--primary);">${blankStickersNoNumsCount.toLocaleString()}</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 25px; color: #666;">└─ Sets of 200 (With Numbers)</td>
-            <td style="text-align: right;">${count200} Sets</td>
-        </tr>
-        <tr style="background: var(--dark); color: white;">
-            <td style="font-weight: bold;">TOTAL UNUSED STOCK</td>
-            <td style="text-align: right; font-weight: 800; color: var(--primary-dark);">
-                ${(blankStickersCount + blankStickersNoNumsCount).toLocaleString()}
-            </td>
-        </tr>
-    `;
-
-    // --- PART B: Date Filtering Logic ---
-    const filteredLogs = auditLogs.filter(log => {
-        if (!startDate || !endDate) return true; 
-        
-        const logDate = new Date(log.date).getTime();
-        const start = startDate.toJSDate().setHours(0, 0, 0, 0);
-        const end = endDate.toJSDate().setHours(23, 59, 59, 999);
-
-        return logDate >= start && logDate <= end;
-    });
-
-    if (!filteredLogs.length) {
-        tbody.innerHTML = '<tr><td colspan="2" class="empty-state" style="padding: 40px; text-align: center;">No logs found for selected dates</td></tr>';
-        document.getElementById('summaryTotalQty').textContent = "0";
-        return;
     }
 
-    // --- PART C: Render Grouped Table (SORTED BY QUANTITY: HIGH TO LOW) ---
-    // 1. Group logs and calculate sub-totals first
-    const itemGroups = filteredLogs.reduce((acc, log) => {
-        const name = log.itemName.toUpperCase().trim();
-        if (!acc[name]) {
-            acc[name] = {
-                logs: [],
-                total: 0
-            };
+    function resetForm() {
+        editingLogId = null; 
+        document.getElementById('itemName').value = '';
+        document.getElementById('quantity').value = '';
+        setDateToday();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerHTML = '➕ Add Log';
+        submitBtn.disabled = false;
+        document.getElementById('cancelBtn').classList.remove('visible');
+        closeDropdown();
+    }
+
+    function cancelEdit() { resetForm(); showToast('↩️ Canceled edit'); }
+
+    // Dropdown Handling
+    function handleItemNameInput(e) { manageDropdown(e.target.value); }
+    function handleItemNameKeydown(e) {
+        const items = document.querySelectorAll('.dropdown-item');
+        if (!items.length) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, items.length - 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); }
+        else if (e.key === 'Enter' && selectedIndex >= 0) { e.preventDefault(); selectDropdownItem(items[selectedIndex].dataset.item); }
+        updateDropdownSelection(items);
+    }
+    function manageDropdown(inputValue) {
+        const container = document.getElementById('dropdownContainer');
+        if (!inputValue) return closeDropdown();
+        const filtered = initialItems.filter(i => i.toLowerCase().includes(inputValue.toLowerCase()));
+        if (!filtered.length) return closeDropdown();
+        container.innerHTML = filtered.map((item, i) => `<div class="dropdown-item" data-item="${item}" data-index="${i}">${item}</div>`).join('');
+        container.classList.add('show');
+        selectedIndex = -1;
+        document.querySelectorAll('.dropdown-item').forEach(el => el.onclick = () => selectDropdownItem(el.dataset.item));
+    }
+    function selectDropdownItem(name) { document.getElementById('itemName').value = name; closeDropdown(); }
+    function updateDropdownSelection(items) { items.forEach((it, i) => it.classList.toggle('selected', i === selectedIndex)); }
+    function closeDropdown() { document.getElementById('dropdownContainer').classList.remove('show'); }
+
+    // Rendering Logs
+    function renderLogs(filter = '') {
+        const container = document.getElementById('logsContainer');
+        const logsToProcess = Array.isArray(auditLogs) ? auditLogs : [];
+        const filtered = logsToProcess.filter(l => l.itemName && l.itemName.toLowerCase().includes(filter.toLowerCase()));
+
+        const totalQty = filtered.reduce((sum, log) => sum + (parseInt(log.quantity) || 0), 0);
+        document.getElementById('totalItems').textContent = filtered.length;
+        document.getElementById('totalQuantity').textContent = totalQty.toLocaleString();
+
+        if (!filtered.length) { 
+            container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">No logs found.</div>'; 
+            return; 
         }
-        acc[name].logs.push(log);
-        acc[name].total += (parseInt(log.quantity) || 0);
-        return acc;
-    }, {});
 
-    // 2. Sort the group names based on their calculated totals (Highest first)
-    const sortedItemNames = Object.keys(itemGroups).sort((a, b) => {
-        return itemGroups[b].total - itemGroups[a].total;
-    });
+        container.innerHTML = filtered.map(log => `
+            <div class="log-item">
+                <div class="log-header">
+                    <div class="item-name">${escapeHtml(log.itemName)}</div>
+                    <div class="quantity-badge">Qty: ${log.quantity.toLocaleString()}</div>
+                </div>
+                <div class="log-meta">
+                    <span>📅 ${formatDate(log.date)}</span>
+                    <span>#${log.id}</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn edit-btn" onclick="editLog(${log.id})">✏️ Edit</button>
+                    <button class="action-btn delete-btn" onclick="deleteLog(${log.id})">🗑️ Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
 
-    let html = '';
-    let grandTotalHold = 0;
+    function editLog(id) {
+        const log = auditLogs.find(l => l.id == id);
+        editingLogId = id;
+        document.getElementById('itemName').value = log.itemName;
+        document.getElementById('quantity').value = log.quantity;
+        document.getElementById('date').value = log.date;
+        document.getElementById('submitBtn').innerHTML = '💾 Update Log';
+        document.getElementById('cancelBtn').classList.add('visible');
+        document.querySelector('#logsTab').scrollIntoView({ behavior: 'smooth' });
+    }
 
-    // 3. Loop through the sorted names to build the HTML
-    sortedItemNames.forEach(itemName => {
-        const group = itemGroups[itemName];
-        const logs = group.logs;
-        
-        // Sort individual logs within the group: Latest Date to Oldest
-        logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+    async function deleteLog(id) {
+        if (!confirm('Are you sure you want to delete this log?')) return;
+        try {
+            showToast('⏳ Deleting log...');
+            const res = await callGoogleScript('deleteLog', { logId: id });
+            if (res && res.success !== false) {
+                showToast('🗑️ Log deleted!');
+                await loadData(); 
+            } else showToast('❌ Delete failed');
+        } catch (error) { showToast('❌ Error connecting to server'); }
+    }
 
-        // Group Header
-        html += `<tr class="item-group-header" style="background-color: #f1f4f9;">
-                    <td style="font-weight: bold;">${escapeHtml(itemName)}</td>
-                    <td style="text-align: right; font-weight: 800; color: var(--primary);"</td>
-                 </tr>`;
+    // Render Summary
+    function renderSummary() {
+        const tbody = document.getElementById('summaryTableBody');
+        const stockBody = document.getElementById('stockBreakdownBody');
+        const startDate = (typeof picker !== 'undefined' && picker) ? picker.getStartDate() : null;
+        const endDate = (typeof picker !== 'undefined' && picker) ? picker.getEndDate() : null;
 
-        // Individual Log Rows
-        logs.forEach(log => {
-            const qty = parseInt(log.quantity) || 0;
-            html += `<tr style="color: #555;">
-                        <td style="padding-left: 30px;">• ${formatDate(log.date)}</td>
-                        <td style="text-align: right; padding-right: 20px;">${qty.toLocaleString()}</td>
-                     </tr>`;
+        const count200 = Math.floor(blankStickersCount / 200);
+        stockBody.innerHTML = `
+            <tr>
+                <td><strong>TOTAL WITHOUT NUMBERS</strong></td>
+                <td style="text-align: right; font-weight: 800; color: var(--primary);">${blankStickersNoNumsCount.toLocaleString()}</td>
+            </tr>
+            <tr>
+                <td style="padding-left: 20px; color: var(--gray);">└─ Sets of 200 (With Numbers)</td>
+                <td style="text-align: right; color: var(--gray);">${count200} Sets</td>
+            </tr>
+            <tr style="background: var(--dark); color: white;">
+                <td style="font-weight: bold; border:none;">TOTAL UNUSED STOCK</td>
+                <td style="text-align: right; font-weight: 800; border:none; color: var(--warning);">
+                    ${(blankStickersCount + blankStickersNoNumsCount).toLocaleString()}
+                </td>
+            </tr>
+        `;
+
+        const filteredLogs = auditLogs.filter(log => {
+            if (!startDate || !endDate) return true; 
+            const logDate = new Date(log.date).getTime();
+            const start = startDate.toJSDate().setHours(0, 0, 0, 0);
+            const end = endDate.toJSDate().setHours(23, 59, 59, 999);
+            return logDate >= start && logDate <= end;
         });
 
-        // Subtotal for the group (Footer for that item)
-        html += `<tr class="item-group-total" style="border-bottom: 2px solid #eee;">
-                    <td style="text-align: right; font-weight: 600; color: var(--primary);">ITEM TOTAL:</td>
-                    <td style="text-align: right; padding-right: 20px; font-weight: 800; color: var(--success);">${group.total.toLocaleString()}</td>
-                 </tr>`;
-                 
-        grandTotalHold += group.total;
-    });
+        if (!filteredLogs.length) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:30px; color:var(--gray);">No logs found for selected dates</td></tr>';
+            return;
+        }
 
-    // Grand Total Row
-    html += `<tr style="background: #f39c12; color: white; font-weight: 700;">
-                <td style="text-align: right; padding: 15px;">GRAND TOTAL HOLD:</td>
-                <td style="text-align: right; padding-right: 20px;">${grandTotalHold.toLocaleString()}</td>
-            </tr>`;
+        const itemGroups = filteredLogs.reduce((acc, log) => {
+            const name = log.itemName.toUpperCase().trim();
+            if (!acc[name]) acc[name] = { logs: [], total: 0 };
+            acc[name].logs.push(log);
+            acc[name].total += (parseInt(log.quantity) || 0);
+            return acc;
+        }, {});
 
-    tbody.innerHTML = html;
-    document.getElementById('summaryTotalQty').textContent = grandTotalHold.toLocaleString();
-}
+        const sortedItemNames = Object.keys(itemGroups).sort((a, b) => itemGroups[b].total - itemGroups[a].total);
 
-async function copyAllLogs() {
-    if (!auditLogs || auditLogs.length === 0) {
-        showToast('⚠️ No logs to copy!');
-        return;
+        let html = '';
+        let grandTotalHold = 0;
+
+        sortedItemNames.forEach(itemName => {
+            const group = itemGroups[itemName];
+            group.logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            html += `<tr class="item-group-header">
+                        <td style="font-weight: 800;">${escapeHtml(itemName)}</td>
+                        <td></td>
+                     </tr>`;
+
+            group.logs.forEach(log => {
+                html += `<tr>
+                            <td style="padding-left: 30px; color: var(--gray); font-size: 14px;">• ${formatDate(log.date)}</td>
+                            <td style="text-align: right;">${(parseInt(log.quantity) || 0).toLocaleString()}</td>
+                         </tr>`;
+            });
+
+            html += `<tr class="item-group-total">
+                        <td style="text-align: right; color: var(--primary);">ITEM TOTAL:</td>
+                        <td style="text-align: right; color: var(--success);">${group.total.toLocaleString()}</td>
+                     </tr>`;
+            grandTotalHold += group.total;
+        });
+
+        html += `<tr style="background: var(--warning); color: var(--dark);">
+                    <td style="text-align: right; font-weight: 800; border:none;">GRAND TOTAL HOLD:</td>
+                    <td style="text-align: right; font-weight: 800; border:none;">${grandTotalHold.toLocaleString()}</td>
+                </tr>`;
+
+        tbody.innerHTML = html;
     }
 
-    // 1. Calculate Stock Breakdown (Matching your UI logic)
+    // Tools
+ async function copyAllLogs() {
+    // 1. Safety Check: Ensure there is actually data to copy
+    if (!auditLogs || auditLogs.length === 0) {
+        return showToast('⚠️ No logs to copy!');
+    }
+
+    // 2. Calculate Sticker Inventory Stats for the header
     const count200 = Math.floor(blankStickersCount / 200);
     const remainderAfter200 = blankStickersCount % 200;
     const count180 = Math.floor(remainderAfter200 / 180);
     const looseStickers = remainderAfter200 % 180;
-    const totalAllBlanks = blankStickersCount + blankStickersNoNumsCount;
+    const totalAllBlanks = (parseInt(blankStickersCount) || 0) + (parseInt(blankStickersNoNumsCount) || 0);
 
-    // 2. Group and Sort Logs by Item Name
+    // 3. Group the logs by Item Name
     const groupedData = auditLogs.reduce((acc, log) => {
+        if (!log.itemName) return acc;
         const name = log.itemName.toUpperCase().trim();
-        const date = formatDate(log.date);
         const qty = parseInt(log.quantity) || 0;
-
-        if (!acc[name]) acc[name] = { logs: [], itemTotal: 0 };
-        acc[name].logs.push({ date: log.date, dateStr: date, qty: qty });
-        acc[name].itemTotal += qty;
         
+        if (!acc[name]) acc[name] = { logs: [], itemTotal: 0 };
+        
+        // Format date: Month Day, Year
+        const logDate = new Date(log.date);
+        const dateStr = !isNaN(logDate) ? logDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A';
+        
+        acc[name].logs.push({ dateStr: dateStr, qty: qty, rawDate: logDate });
+        acc[name].itemTotal += qty;
         return acc;
     }, {});
 
-    // 3. Build the formatted string
-    const today = new Date().toLocaleDateString();
-    let textToCopy = `STICKER SUMMARY (${today})\n`;
+    // 4. Build the Output String
+    const headerDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    let textToCopy = `📦 STICKER SUMMARY (${headerDate})\n`;
     textToCopy += `------------------------------\n`;
     textToCopy += `WITHOUT NUMBERS (Bulk): ${blankStickersNoNumsCount.toLocaleString()}\n`;
     textToCopy += `WITH NUMBERS (Total): ${blankStickersCount.toLocaleString()}\n`;
@@ -1256,170 +1105,251 @@ async function copyAllLogs() {
     textToCopy += `  └─ Sets of 180: ${count180}\n`;
     if (looseStickers > 0) textToCopy += `  └─ Loose: ${looseStickers}\n`;
     textToCopy += `TOTAL UNUSED STOCK: ${totalAllBlanks.toLocaleString()}\n`;
-    textToCopy += `------------------------------\n\n`;
+    textToCopy += `------------------------------\n\n📋 HOLD STICKER LOGS\n\n`;
     
-    textToCopy += `📋 HOLD STICKER LOGS\n\n`;
     let grandTotalHold = 0;
-    
-    // 🔴 THE FIX: Sort by total quantity (highest to lowest) instead of alphabetically
-    const sortedItemNames = Object.keys(groupedData).sort((a, b) => {
-        return groupedData[b].itemTotal - groupedData[a].itemTotal;
-    });
+    const sortedItemNames = Object.keys(groupedData).sort((a, b) => groupedData[b].itemTotal - groupedData[a].itemTotal);
 
     for (const itemName of sortedItemNames) {
         const data = groupedData[itemName];
         textToCopy += `${itemName}\n`;
         
-        // Sort logs: Latest to Oldest
-        data.logs.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        for (const entry of data.logs) {
-            textToCopy += `${entry.dateStr} - ${entry.qty.toLocaleString()}\n`;
-        }
+        data.logs.sort((a, b) => b.rawDate - a.rawDate).forEach(entry => {
+            textToCopy += `    • ${entry.dateStr} - ${entry.qty.toLocaleString()}\n`;
+        });
         
         textToCopy += `ITEM TOTAL = ${data.itemTotal.toLocaleString()}\n\n`;
         grandTotalHold += data.itemTotal;
     }
-
+    
     textToCopy += `==============================\n`;
     textToCopy += `GRAND TOTAL HOLD: ${grandTotalHold.toLocaleString()}`;
 
-    // 4. Execution with Fallback
-    if (navigator.clipboard && window.isSecureContext) {
-        try {
-            await navigator.clipboard.writeText(textToCopy);
-            showToast('📋 Summary & Logs Copied!');
-            return;
-        } catch (err) {
-            console.warn('Modern copy failed, trying fallback...');
-        }
-    }
-
+    // 5. Execute Copy to Clipboard
     try {
+        await navigator.clipboard.writeText(textToCopy);
+        showToast('📋 Summary copied to clipboard!');
+    } catch (err) {
+        console.error('Copy failed:', err);
         const textArea = document.createElement("textarea");
         textArea.value = textToCopy;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
         document.body.appendChild(textArea);
-        textArea.focus();
         textArea.select();
-        const successful = document.execCommand('copy');
-        document.body.removeChild(textArea);
-        if (successful) showToast('📋 Copied (Fallback Mode)');
-    } catch (err) {
-        showToast('❌ Copy failed.');
-    }
-}
-
-        // Utilities
-        function escapeHtml(t) { return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-        function formatDate(ds) { return ds ? new Date(ds).toLocaleDateString() : 'N/A'; }
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            t.textContent = m;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
+        try {
+            document.execCommand('copy');
+            showToast('📋 Copied (Fallback)!');
+        } catch (fallbackErr) {
+            showToast('❌ Copy failed.');
         }
-        // New function to specifically handle the deduction input
-async function handleDeduction(type) {
-    const inputId = (type === 'without') ? 'manualBlankWithout' : 'manualBlankWith';
-    const input = document.getElementById(inputId);
-    const val = parseInt(input.value);
-    
-    if (isNaN(val) || val <= 0) {
-        showToast('⚠️ Enter a valid quantity to deduct');
-        return;
+        document.body.removeChild(textArea);
     }
-
-    await modifyBlankStickers(-val, type);
-    input.value = '';
 }
-async function copyTableAsImage() {
-    const tableContainer = document.getElementById('summaryTable');
-    
-    if (!tableContainer) {
-        showToast('⚠️ Table not found!');
-        return;
+
+    async function handleDeduction(type) {
+        const input = document.getElementById(type === 'without' ? 'manualBlankWithout' : 'manualBlankWith');
+        const val = parseInt(input.value);
+        if (isNaN(val) || val <= 0) return showToast('⚠️ Enter a valid quantity');
+        await modifyBlankStickers(-val, type);
+        input.value = '';
     }
 
-    const btn = event.currentTarget;
+    async function copyTableAsImage() {
+        const tableContainer = document.getElementById('summaryTableWrapper');
+        if (!tableContainer) return showToast('⚠️ Table not found!');
+        
+        const originalBg = tableContainer.style.background;
+        tableContainer.style.background = '#ffffff'; // force white bg for capture
+        
+        try {
+            showToast('⏳ Generating Image...');
+            const canvas = await html2canvas(tableContainer, { scale: 2, backgroundColor: "#ffffff" });
+            canvas.toBlob(async (blob) => {
+                await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                showToast('📋 Image copied to clipboard!');
+            }, 'image/png');
+        } catch (error) { showToast('❌ Capture failed.'); }
+        finally { tableContainer.style.background = originalBg; }
+    }
+
+    async function triggerManualUpload() {
+        if (!confirm('Sync all current logs to the Google Sheet?')) return;
+        try {
+            showToast('⏳ Uploading...');
+            const result = await callGoogleScript('uploadHoldQuantities');
+            if (result && result.success !== false) showToast('✅ Upload Successful!');
+            else showToast('❌ Upload failed');
+        } catch (error) { showToast('❌ Connection error.'); }
+    }
+
+    // --- NEW PRODUCT LOGIC ---
+   // --- NEW PRODUCT LOGIC ---
+// --- NEW PRODUCT LOGIC ---
+async function handleNewProductSubmit(e) {
+    e.preventDefault();
+    const multiplier = document.getElementById('newProdMultiplier').value;
+    const name = document.getElementById('newProdName').value.trim().toUpperCase();
+    
+    // Combine them into the format: "1 x ITEM NAME"
+    const fullItemString = `${multiplier} ${name}`;
+    
+    // 1. Show loading state on button
+    const btn = e.target.querySelector('button');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '⏳ Copying...';
+    btn.innerHTML = '⌛ Saving...';
     btn.disabled = true;
 
     try {
-        // High-quality capture settings
-        const canvas = await html2canvas(tableContainer, {
-            scale: 2, 
-            backgroundColor: "#ffffff",
-            useCORS: true,
-            logging: false
-        });
+        // 2. Call the new function in code.gs to save to the "All Products" sheet
+        const response = await callGoogleScript('addNewProduct', { productName: fullItemString });
 
-        // Convert to Blob and Copy
-        canvas.toBlob(async (blob) => {
-            try {
-                const data = [new ClipboardItem({ [blob.type]: blob })];
-                await navigator.clipboard.write(data);
-                showToast('📋 Image copied to clipboard!');
-            } catch (err) {
-                console.error(err);
-                showToast('❌ Browser blocked copy. See instructions below.');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+        if (response.success) {
+            // 3. Add to local list so it appears in the Hold Logs dropdown immediately
+            if(!initialItems.includes(fullItemString)) {
+                initialItems.push(fullItemString);
+                initialItems.sort(); 
+                // If you have a function to refresh your dropdown UI, call it here:
+                // renderDropdowns(); 
             }
-        }, 'image/png');
 
+            // 4. Update the "Recent Products" table in the UI
+            const tbody = document.getElementById('newProductListBody');
+            if(tbody.innerText.includes('No new products')) tbody.innerHTML = '';
+            
+            tbody.innerHTML = `
+                <tr>
+                    <td style="font-weight: bold; color: var(--primary);">${fullItemString}</td>
+                    <td><span class="quantity-badge" style="background: #E6FFFA; color: #01B574;">Saved to Sheet</span></td>
+                </tr>
+            ` + tbody.innerHTML;
+
+            showToast(`✅ ${fullItemString} saved to All Products sheet!`);
+            e.target.reset();
+            document.getElementById('newProdMultiplier').value = "1 x";
+        } else {
+            showToast(`⚠️ ${response.message}`);
+        }
     } catch (error) {
-        showToast('❌ Capture failed.');
+        console.error(error);
+        showToast('PUMASOK ANG BAGONG ITEM MO ROYELLE!!!!!');
+    } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-let picker; // Ensure this is declared at the top of your <script> tag
+    // Utilities
+    function escapeHtml(t) { return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+    function formatDate(ds) { return ds ? new Date(ds).toLocaleDateString() : 'N/A'; }
+    function showToast(m) {
+        const t = document.getElementById('toast');
+        t.textContent = m;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
 
-window.addEventListener('DOMContentLoaded', () => {
-    picker = new Litepicker({
-        element: document.getElementById('summaryRangePicker'),
-        singleMode: false, 
-        numberOfMonths: 2, 
-        numberOfColumns: 2,
-        format: 'YYYY-MM-DD',
-        setup: (pickerInstance) => {
-            pickerInstance.on('selected', () => {
-                renderSummary(); 
-            });
-            pickerInstance.on('clear:selection', () => {
-                renderSummary(); 
-            });
-        },
+    // Initialize Litepicker
+    let picker;
+    window.addEventListener('DOMContentLoaded', () => {
+        picker = new Litepicker({
+            element: document.getElementById('summaryRangePicker'),
+            singleMode: false, 
+            numberOfMonths: 2, 
+            numberOfColumns: 2,
+            format: 'YYYY-MM-DD',
+            setup: (p) => {
+                p.on('selected', () => renderSummary());
+                p.on('clear:selection', () => renderSummary());
+            },
+        });
     });
-});
-async function triggerManualUpload() {
-    // 1. Confirm with the user
-    if (!confirm('This will sync all current logs to the "HOLD Sticker Upload" sheet. Continue?')) return;
+    async function applyDeduction() {
+    const itemName = document.getElementById('deductItemName').value.trim().toUpperCase();
+    let qtyToDeduct = parseInt(document.getElementById('deductQty').value);
 
+    if (!itemName || isNaN(qtyToDeduct) || qtyToDeduct <= 0) {
+        return showToast('⚠️ Select a product and valid quantity');
+    }
+
+    // 1. Filter logs for this item and sort by date: Newest to Oldest
+    const itemLogs = auditLogs
+        .filter(log => log.itemName.toUpperCase().trim() === itemName)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const totalAvailable = itemLogs.reduce((sum, log) => sum + parseInt(log.quantity), 0);
+
+    if (qtyToDeduct > totalAvailable) {
+        return showToast(`❌ Not enough stock! Only ${totalAvailable} available.`);
+    }
+
+    if (!confirm(`Deduct ${qtyToDeduct} from ${itemName}? (Newest logs will be removed first)`)) return;
+
+    showToast('⏳ Processing deductions...');
+    
     try {
-        showToast('⏳ Uploading to Google Sheets...');
-        
-        // 2. Call the existing upload function in your code.gs
-        const result = await callGoogleScript('uploadHoldQuantities');
+        for (let log of itemLogs) {
+            if (qtyToDeduct <= 0) break;
 
-        // 3. Handle the response
-        if (result && result.success !== false) {
-            showToast('✅ Upload Successful! Check your Spreadsheet.');
-        } else {
-            showToast('❌ Upload failed: ' + (result.message || 'Unknown error'));
+            const logQty = parseInt(log.quantity);
+
+            if (logQty <= qtyToDeduct) {
+                // Remove the entire log entry
+                await callGoogleScript('deleteLog', { logId: log.id });
+                qtyToDeduct -= logQty;
+            } else {
+                // Update the log with the remaining quantity
+                const newQty = logQty - qtyToDeduct;
+                await callGoogleScript('updateLog', { 
+                    id: log.id, 
+                    itemName: log.itemName, 
+                    quantity: newQty, 
+                    date: log.date 
+                });
+                qtyToDeduct = 0;
+            }
         }
+
+        showToast('✅ Deduction complete!');
+        document.getElementById('deductQty').value = '';
+        await loadData(); // Refresh everything
     } catch (error) {
-        console.error('Upload Error:', error);
-        showToast('❌ Connection error during upload.');
+        showToast('❌ Error during deduction');
+        console.error(error);
     }
 }
-    </script>
-</body>
+// Function to show and filter all items in the Deduction tool
+function manageDeductDropdown(inputValue) {
+    const container = document.getElementById('deductDropdown');
+    
+    // Combine initial items with any new logs added to ensure all products are visible
+    const allProducts = [...new Set([...initialItems, ...auditLogs.map(l => l.itemName)])].sort();
+    
+    const filtered = allProducts.filter(i => 
+        i.toLowerCase().includes(inputValue.toLowerCase())
+    );
 
+    if (!filtered.length) {
+        container.innerHTML = '<div class="dropdown-item">No products found</div>';
+    } else {
+        container.innerHTML = filtered.map(item => 
+            `<div class="dropdown-item" onclick="selectDeductItem('${item}')">${item}</div>`
+        ).join('');
+    }
+    
+    container.classList.add('show');
+}
+
+// Function to select an item from the deduction dropdown
+function selectDeductItem(name) {
+    document.getElementById('deductItemName').value = name;
+    document.getElementById('deductDropdown').classList.remove('show');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('#deductItemName') && !e.target.closest('#deductDropdown')) {
+        document.getElementById('deductDropdown').classList.remove('show');
+    }
+});
+</script>
+</body>
 </html>
